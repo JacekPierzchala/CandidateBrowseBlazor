@@ -1,0 +1,47 @@
+﻿@inject ILocalStorageService _localStorageService;
+
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider;
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly" OnNavigateAsync="OnNavigateAsync">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <NotAuthorized>
+                    @if (context.User?.Identity?.IsAuthenticated == false)
+                    {
+                        <RedirectToLogin />
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">
+                            <p>You are not authorized to access this resource.</p>
+                        </div>
+                    }
+                </NotAuthorized>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p role="alert">Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+
+    </Router>
+
+</CascadingAuthenticationState>
+
+
+@code
+{
+    private async Task OnNavigateAsync(NavigationContext args)
+    {
+  
+        if (UrlStatics.externalAuthEndpoints.Any(endpoint => args.Path.Contains(endpoint)))
+        {
+            await _localStorageService.SetItemAsync("AuthUrl", args.Path);
+            NavigationManager.NavigateTo(UrlStatics.externalAuthentication);
+        }
+    }
+}

@@ -1,0 +1,29 @@
+﻿@page "/counter"
+@attribute [Authorize(Policy = PermissionStatics.CandidateRead)]
+
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+   <AuthorizeView>
+    <h3>@context.User?.Identity?.Name</h3>
+   </AuthorizeView>
+
+
+<p role="status">Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+@code {
+    private int currentCount = 0;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+}

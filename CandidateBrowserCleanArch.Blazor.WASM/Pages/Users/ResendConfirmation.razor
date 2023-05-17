@@ -1,0 +1,91 @@
+﻿@page "/users/ResendConfirmation"
+@inject NavigationManager NavigationManager
+@inject IAuthenticationService AuthenticationService
+@inject NotificationService NotificationService
+
+
+@if (ResendProcessError )
+{
+    <RadzenAlert Title="@messageTitle" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
+        <RadzenText>@message</RadzenText>
+    </RadzenAlert>
+}
+
+@if (ResendProcessSuccess && !ResendProcessPending)
+{
+    <RadzenAlert Title="@messageTitle" AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter">
+        <RadzenText>@message</RadzenText>
+    </RadzenAlert>
+}
+
+@if (!ResendProcessPending)
+{
+    <RadzenStack Gap="0" Class="rz-my-12 rz-mx-auto rz-border-radius-6 rz-shadow-10" Style="width: 100%; max-width: 450px; overflow: hidden;">
+        <RadzenCard Class="rz-shadow-0 rz-border-radius-0 rz-background-color-info rz-p-12" style="text-align: center;">
+            <RadzenText TextStyle="TextStyle.DisplayH3" TagName="TagName.H2" Class="rz-color-white rz-mb-0">Candidates Browser</RadzenText>
+        </RadzenCard>
+        <EditForm Model="ResendConfirmationViewModel" OnValidSubmit="HandleResend">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <RadzenCard>
+                <RadzenStack>
+                <RadzenTextBox Placeholder="Email" @bind-Value="ResendConfirmationViewModel.Email" />
+                <RadzenButton class="mt-1" ButtonType="ButtonType.Submit"><RadzenIcon Icon="send" />Send Confirmation</RadzenButton>
+                </RadzenStack>
+            </RadzenCard>
+        </EditForm>
+    <RadzenButton class="mt-1" Click="BackToRegister"><RadzenIcon Icon="arrow_back_ios_new" />Back to Register</RadzenButton>
+</RadzenStack>
+}
+else
+{
+    <LoadingElement Message="Sending confirmation ..." />
+}
+
+@code {
+    ResendConfirmationViewModel ResendConfirmationViewModel = new();
+    bool ResendProcessPending;
+    bool ResendProcessError;
+    bool ResendProcessSuccess;
+    string message = string.Empty;
+    string messageTitle = string.Empty;
+
+    private async Task HandleResend()
+    {
+        ResendProcessPending = true;
+        ResendProcessError = false;
+        ResendProcessSuccess = false;
+        StateHasChanged();
+
+        var response = await AuthenticationService.ResendConfirmationAsync(ResendConfirmationViewModel);
+        if (response.Success)
+        {
+            NotificationService
+            .Notify(new NotificationMessage
+           {
+               Severity = NotificationSeverity.Success,
+               Duration = 4000,
+               Summary = response.Message,
+               Detail = $"Registration link has been to {ResendConfirmationViewModel.Email}"
+           });
+            ResendProcessPending = false;
+            NavigationManager.NavigateTo(UrlStatics.login);
+        }
+        else
+        {
+            message = response.ValidationErrors;
+            messageTitle = response.Message;
+            ResendProcessError = true;
+        }
+        ResendProcessPending = false;
+
+        StateHasChanged();
+    }
+
+    private void BackToRegister()
+    {
+        NavigationManager.NavigateTo(UrlStatics.register);
+    }
+
+
+}

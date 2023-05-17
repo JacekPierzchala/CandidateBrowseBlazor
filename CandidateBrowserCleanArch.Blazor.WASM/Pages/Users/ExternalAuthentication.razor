@@ -1,0 +1,18 @@
+﻿@page "/users/externalAuthentication"
+@inject NavigationManager NavigationManager
+@inject IAuthenticationService AuthenticationService;
+@inject ILocalStorageService _localStorageService;
+
+<LoadingElement Message="Authorizing..." />
+
+@code {
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        var url = await _localStorageService.GetItemAsStringAsync("AuthUrl");
+        await AuthenticationService.AuthenticateByGoogleAsync(url);
+        await _localStorageService.RemoveItemAsync("AuthUrl");
+        NavigationManager.NavigateTo(UrlStatics.home);
+    }
+}

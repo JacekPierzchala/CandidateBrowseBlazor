@@ -1,0 +1,91 @@
+﻿@page "/candidate/{id:int}"
+@inject IAuthenticationService AuthenticationService
+@inject ICandidatesService CandidatesService
+@inject HttpInterceptorService HttpInterceptorService
+@implements IDisposable
+@attribute [Authorize(Policy = PermissionStatics.CandidateRead)]
+
+@if (Candidate != null)
+{
+    <RadzenCard class="my-4" style="min-width:fit-content">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+
+           @* <RadzenCard class="rz-shadow-5 rz-my-6 rz-mx-auto"  >*@
+            <RadzenCard class="rz-shadow-5 rz-my-6" >
+                <RadzenStack Orientation="Orientation.Horizontal"  JustifyContent="JustifyContent.Start" Gap="1rem" Class="rz-p-1 flex-row">
+                    <RadzenImage Path="@Candidate?.ProfilePath" Style="width: 250px; height: 250px; border-radius: 50%;" />
+                    <RadzenStack Gap="0">
+                        <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Candidate</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body1"><b>@(Candidate?.FirstName + " " + Candidate?.LastName)</b></RadzenText>
+                        <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">Date of Birth</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body1"><b>@Candidate?.DateOfBirth.ToString("yyyy-MM-dd")</b></RadzenText>
+                        <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex flex-sm-row rz-mt-4 rz-mb-0">Email</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body1"><b>@Candidate?.Email</b></RadzenText>
+                    </RadzenStack>
+                </RadzenStack>
+                <RadzenStack JustifyContent="JustifyContent.Start" Gap="0" Class="rz-p-2" Wrap="FlexWrap.Wrap">
+                    <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Description:</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1">@Candidate?.Description</RadzenText>
+                </RadzenStack>
+            </RadzenCard>
+            <RadzenCard class="rz-shadow-5 rz-my-3 rz-mx-auto">
+                <RadzenStack JustifyContent="JustifyContent.Start" Gap="1rem" Class="rz-p-1">
+                    <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Companies:</RadzenText>
+                    <ul class="timeline align-items-start mt-2 ml-5">
+                        @foreach (var company in Candidate.Companies)
+                        {
+                            <li>
+                                <RadzenStack JustifyContent="JustifyContent.Start" Gap="0" Class="rz-p-2">
+                                    <RadzenText TextStyle="TextStyle.Body1"><b>@($"{company.Company.CompanyName}: {@company.Position}")</b></RadzenText>
+                                    <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">@(@company.DateStart.ToString("yyyy-MM-dd") + " : " + (@company.DateEnd.HasValue ? @company.DateEnd?.ToString("yyyy-MM-dd") : "Current"))</RadzenText>
+                                    </RadzenStack>
+                                </li>
+                        }
+                    </ul>
+                </RadzenStack>
+            </RadzenCard>
+            <RadzenCard class="rz-shadow-5 rz-my-3 rz-mx-auto">
+                <RadzenStack JustifyContent="JustifyContent.Start" Gap="1rem" Class="rz-p-1">
+                    <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Projects:</RadzenText>
+                    <ul class="timeline align-items-start mt-2 ml-5">
+                        @foreach (var project in Candidate.Projects)
+                        {
+                            <li>
+                                <RadzenStack JustifyContent="JustifyContent.Start" Gap="0" Class="rz-p-2">
+                                    <RadzenText TextStyle="TextStyle.Body1"><b>@(project.Project.ProjectName)</b></RadzenText>
+                                 </RadzenStack>
+                                </li>
+                        }
+                    </ul>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenStack>
+    </RadzenCard>
+
+}
+else
+{
+    <LoadingElement Message="Loading candidate details..." />
+}
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    CandidateDetailsDto Candidate;
+    bool loadDataResult;
+    protected async override Task OnInitializedAsync()
+    {
+        HttpInterceptorService.RegisterEvent();
+
+        var request = await CandidatesService.GetCandidateDetailsAsync(Id);
+        loadDataResult = request.Success;
+        Candidate = request.Data;
+    }
+
+
+    public void Dispose()
+    {
+        HttpInterceptorService.DisposeEvent();
+    }
+}

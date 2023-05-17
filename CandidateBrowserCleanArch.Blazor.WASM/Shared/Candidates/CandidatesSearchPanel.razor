@@ -1,0 +1,83 @@
+﻿@inject CandidateSearchStateContainer CandidateSearchStateContainer
+@inject ICompaniesService CompaniesService
+@inject IProjectsService ProjectsService
+@inject HttpInterceptorService HttpInterceptorService
+@implements IDisposable
+
+@if (Companies != null && Projects != null)
+{
+    <div class="container-fluid">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+            <RadzenButton Click=@RaiseSearchStarted Text="Search" Shade="Shade.Light" Variant="Variant.Flat" Icon="search" ButtonStyle="ButtonStyle.Primary" />
+            <RadzenButton Click=@ResetFilters Text="Reset Filters" Icon="clear" Shade="Shade.Light" ButtonStyle="ButtonStyle.Secondary" />
+        </RadzenStack>
+        <RadzenCard class="mt-1" Style="width: 100%; max-width: 400px;">
+            <RadzenText TextStyle="TextStyle.Subtitle2">First Name</RadzenText>
+            <RadzenTextBox @bind-Value="@CandidateSearchStateContainer.CandidateSearchParameters.FirstName" class="w-100"></RadzenTextBox>
+        </RadzenCard>
+        <RadzenCard class="mt-1" Style="width: 100%; max-width: 400px;">
+            <RadzenText TextStyle="TextStyle.Subtitle2">Last Name</RadzenText>
+            <RadzenTextBox @bind-Value="@CandidateSearchStateContainer.CandidateSearchParameters.LastName" class="w-100"></RadzenTextBox>
+        </RadzenCard>
+        @if (Companies != null)
+        {
+
+            <RadzenDropDown class="mt-1" @bind-Value=@CandidateSearchStateContainer.CandidateSearchParameters.Companies Data=@Companies TextProperty="CompanyName" ValueProperty="Id"
+                    Multiple=true Placeholder="Select companies" Chips=true Style="width: 100%; max-width: 400px;" />
+
+        }
+        @if (Projects != null)
+        {
+            <RadzenDropDown class="mt-1" @bind-Value=@CandidateSearchStateContainer.CandidateSearchParameters.Projects Data=@Projects TextProperty="ProjectName" ValueProperty="Id"
+                    Multiple=true Placeholder="Select projects" Chips=true Style="width: 100%; max-width: 400px;" />
+
+        }
+    </div>
+}
+else
+{
+    <LoadingElement Message="Loading data..." />
+}
+
+
+
+@code {
+    IEnumerable<ReadCompanyDto> Companies;
+    IEnumerable<ReadProjectDto> Projects;
+
+
+    private void RaiseSearchStarted()
+    {
+        CandidateSearchStateContainer.CandidateSearchParameters.PageNumber = 1;
+        CandidateSearchStateContainer.SearchTrigerred?.Invoke();
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        HttpInterceptorService.RegisterEvent();
+        var resultCompany = await CompaniesService.GetAllActiveCompaniesAsync(false);
+        if (resultCompany.Success)
+        {
+            Companies = resultCompany?.Data;
+        }
+
+        var resultProject = await ProjectsService.GetAllActiveProjectsAsync(false);
+        if (resultProject.Success)
+        {
+            Projects = resultProject?.Data;
+        }
+
+        StateHasChanged();
+    }
+
+    private void ResetFilters()
+    {
+        CandidateSearchStateContainer.ClearSearchParameters();
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        HttpInterceptorService.DisposeEvent();
+    }
+}

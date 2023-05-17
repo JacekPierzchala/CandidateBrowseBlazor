@@ -1,0 +1,127 @@
+﻿@page "/users/register"
+
+@inject IAuthenticationService AuthenticationService
+@inject NavigationManager NavigationManager
+@inject NotificationService NotificationService
+
+
+@if (RegisterProcessError)
+{
+    <RadzenAlert Title="@messageTitle" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
+        <RadzenText>@message</RadzenText>
+    </RadzenAlert>
+}
+@if (RegisterProcessSuccess)
+{
+    <RadzenAlert Title="@messageTitle" AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter">
+        <RadzenText>@message</RadzenText>
+    </RadzenAlert>
+}
+
+@if (!RegisterProcessPending)
+{
+    <RadzenStack Gap="0" Class="rz-my-12 rz-mx-auto rz-border-radius-6 rz-shadow-10" Style="width: 100%; max-width: 450px; overflow: hidden;">
+        <RadzenCard Class="rz-shadow-0 rz-border-radius-0 rz-background-color-info rz-p-12" style="text-align: center;">
+            <RadzenText TextStyle="TextStyle.DisplayH3" TagName="TagName.H2" Class="rz-color-white rz-mb-0">Candidates Browser</RadzenText>
+        </RadzenCard>
+        <EditForm Model="RegisterViewModel" OnValidSubmit="HandleRegister">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <RadzenCard>
+                <RadzenStack>
+                    <RadzenTextBox Placeholder="First Name" @bind-Value="RegisterViewModel.FirstName" />
+                    <RadzenTextBox Placeholder="Last Name" @bind-Value="RegisterViewModel.LastName" />
+                    <RadzenTextBox Placeholder="Email Address" @bind-Value="RegisterViewModel.Email" />
+                    <RadzenPassword Placeholder="Password" @bind-Value="RegisterViewModel.Password" />
+                    <RadzenPassword Placeholder="ConfirmPassword" @bind-Value="RegisterViewModel.ConfirmPassword" />
+                    <RadzenButton class="mt-1" ButtonType="ButtonType.Submit"><RadzenIcon Icon="person_add" />Register</RadzenButton>
+                </RadzenStack>
+            </RadzenCard>
+        </EditForm>
+        <RadzenStack  >
+            <RadzenButton Click="RouteToResendConfirmation" Style="width:350px; align-self:center">Resend confirmation link</RadzenButton>
+        </RadzenStack>
+        <RadzenCard Class="rz-background-color-base-300" style="text-align: center;">
+            <button type="button" class="btn" @onclick="@HandleGoogleLogin"><img src="/img_templates/google_signin.png"></button>
+        </RadzenCard>
+        <RadzenCard Class="rz-background-color-base-300" style="text-align: center;">
+            <RadzenText>Have account already?</RadzenText>
+            <RadzenButton Click="RouteToLogin" class="mt-1" ButtonStyle="ButtonStyle.Secondary"><RadzenIcon Icon="login" />Go to Login</RadzenButton>
+        </RadzenCard>
+    </RadzenStack>
+
+
+
+}
+else
+{
+    <LoadingElement Message="Registering ..." />
+}
+@code {
+
+
+    RegisterViewModel RegisterViewModel = new();
+    string message = string.Empty;
+    string messageTitle = string.Empty;
+    bool RegisterProcessPending;
+    bool RegisterProcessError;
+    bool RegisterProcessSuccess;
+    private async Task HandleRegister()
+    {
+        RegisterProcessPending = true;
+        RegisterProcessError = false;
+        RegisterProcessSuccess = false;
+        StateHasChanged();
+
+        var response = await AuthenticationService.RegisterAsync(RegisterViewModel);
+        if (response.Success)
+        {
+
+           NotificationService
+          .Notify(new NotificationMessage
+              {
+                  Severity = NotificationSeverity.Success,
+                  Duration = 4000,
+                  Summary = "Success",
+                  Detail = $"Registration link has been to {RegisterViewModel.Email}"
+              });
+
+            RegisterViewModel = new();
+            RegisterProcessSuccess = true;
+            RegisterProcessPending = false;
+            RouteToLogin();
+        }
+        else
+        {
+            message = response.ValidationErrors;
+            messageTitle = response.Message;
+            RegisterProcessError = true;
+        }
+        RegisterProcessPending = false;
+
+        StateHasChanged();
+    }
+
+
+    private async Task HandleGoogleLogin()
+    {
+        var response = await AuthenticationService.GetGoogleAuthUrlAsync();
+        if (!response.Success)
+        {
+            NotificationService.Notify(new NotificationMessage() { Detail = response.Message });
+        }
+        NavigationManager.NavigateTo(response.Data, false);
+    }
+
+
+    private void RouteToLogin()
+    {
+        NavigationManager.NavigateTo(UrlStatics.login);
+    }
+
+    private void RouteToResendConfirmation()
+    {
+        NavigationManager.NavigateTo(UrlStatics.resendConfirmation);
+    }
+}
+

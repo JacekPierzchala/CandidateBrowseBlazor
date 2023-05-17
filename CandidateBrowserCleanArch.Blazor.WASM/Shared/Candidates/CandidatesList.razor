@@ -1,0 +1,117 @@
+﻿
+@inject ICandidatesService CandidatesService
+@inject CandidateSearchStateContainer CandidateSearchStatecontainer
+@inject HttpInterceptorService HttpInterceptorService
+@inject NavigationManager NavigationManager
+@implements IDisposable
+<div class="container-fluid">
+    @if(Candidates!=null)
+    {
+        <RadzenDataList  Density=Density.Compact WrapItems="true" AllowPaging="true" Data="@Candidates"  TItem="CandidateListDto">
+            <Template  Context="candidate">
+                <RadzenCard Style="width:300px;max-width:300px; cursor:pointer" @onclick="@(async ()=> await SelectCandidate(candidate.Id))" class="rz-shadow-5" >
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" >
+                        <RadzenImage  Path="@candidate.ProfilePath" Style="width: 80px; height: 80px; border-radius: 50%;" />
+                        <RadzenStack Gap="0">
+                            <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Candidate</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Body1"><b>@($"{candidate?.FirstName} {candidate?.LastName}")</b></RadzenText>
+
+                            <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Companies:</RadzenText>
+                            @foreach (var company in candidate.Companies)
+                            {
+                                <RadzenText TextStyle="TextStyle.Caption"><b>@(company.Company.CompanyName)</b></RadzenText>
+                            }
+                            <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Projects:</RadzenText>
+                            @foreach (var project in candidate.Projects)
+                            {
+                                <RadzenText TextStyle="TextStyle.Caption"><b>@(project.Project.ProjectName)</b></RadzenText>
+                            }
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenCard>
+            </Template>
+        </RadzenDataList>
+    }
+
+    else if (Candidates != null && !LoadDataSuccess)
+    {
+        <h5>@ErrorMessage</h5>
+    }
+    else
+    {
+        <LoadingElement Message="Loading candidates data ..."/>
+    }
+ 
+</div>
+@if (Candidates != null)
+{   <div class="container-fluid ms-2">
+      <Pagination  Size=CandidateSearchStatecontainer.CandidateSearchParameters.PageSize  SelectedPage="SelectedPage" SelectedSize="SelectedSize"/>
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public EventCallback<bool> LoadDataChanged { get; set; }
+
+    public bool LoadDataSuccess { get; set; }
+    private string ErrorMessage = string.Empty;
+
+    IEnumerable<CandidateListDto>? Candidates;
+    protected async override Task OnInitializedAsync()
+    {
+        await LoadDataChanged.InvokeAsync(false);
+        HttpInterceptorService.RegisterEvent();
+        CandidateSearchStatecontainer.ClearSearchParameters();
+        CandidateSearchStatecontainer.SearchTrigerred += async () => await SearchAsync();
+        await SearchAsync();
+        await LoadDataChanged.InvokeAsync(true);
+    }
+
+    private async Task SearchAsync()
+    {
+        Candidates = null;
+        StateHasChanged();
+        var result = await CandidatesService.GetActiveCandidatesAsync
+                    (CandidateSearchStatecontainer.CandidateSearchParameters);
+        LoadDataSuccess = result.Success;
+        if (result.Success)
+        {
+            Candidates = result.Data;
+        }
+        else
+        {
+            Candidates = new List<CandidateListDto>();
+            ErrorMessage = result.Message;
+        }
+        StateHasChanged();
+    }
+
+
+    private async Task SelectCandidate(int candidate)
+    {
+        NavigationManager.NavigateTo($"/candidate/{candidate}");
+    }
+
+
+    private async Task SelectedPage(int page)
+    {
+        CandidateSearchStatecontainer.CandidateSearchParameters.PageNumber = page;
+        await SearchAsync();
+    }
+
+    private async Task SelectedSize(int size)
+    {
+        CandidateSearchStatecontainer.CandidateSearchParameters.PageSize = size;
+        await SearchAsync();
+    }
+
+
+
+
+    public void Dispose()
+    {
+        CandidateSearchStatecontainer.SearchTrigerred -= async () => await SearchAsync();
+        HttpInterceptorService.DisposeEvent();
+    }
+}

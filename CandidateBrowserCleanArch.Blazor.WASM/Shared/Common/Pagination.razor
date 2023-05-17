@@ -1,0 +1,82 @@
+﻿@inject CandidateSearchStateContainer CandidateSearchStateContainer
+
+<RadzenStack Orientation="Orientation.Horizontal"  AlignItems="AlignItems.Center">
+    <RadzenText TextStyle="TextStyle.Overline">Items per page:</RadzenText>
+    <RadzenDropDown @bind-Value=@Size Data=@sizes Style="max-width: 80px; min-width:75px" Change="@(async()=>await OnSelectedSize())" />
+    <RadzenText Style="min-width:120px" TextStyle="TextStyle.Overline">@pagingSummaryFormat</RadzenText>
+    <RadzenStack Orientation="Orientation.Horizontal" class="rz-border-primary-lighter rz-border-radius-2" AlignItems="AlignItems.Center">
+        
+        @foreach (var link in _links)
+        {
+            <RadzenButton Click="() => OnSelectedPage(link)" 
+                Variant="@(link.Text==CandidateSearchStateContainer.CandidateSearchParameters.PageNumber.ToString()? Variant.Filled:Variant.Text)" 
+                Style="width:40px; max-width:40px" Disabled="!link.Enabled" Text="@link.Text" ButtonStyle="ButtonStyle.Primary"/>
+        }
+    </RadzenStack>
+</RadzenStack>
+
+
+@code {
+    int Spread = 5;
+    [Parameter]
+    public EventCallback<int> SelectedPage { get; set; }
+    [Parameter]
+    public EventCallback<int> SelectedSize { get; set; }
+    [Parameter]
+    public int Size { get; set; }
+
+    private List<int> sizes= new List<int>(){ 5,10};
+    string pagingSummaryFormat = string.Empty;
+
+    bool HasPrevious => CandidateSearchStateContainer.CandidateSearchParameters.PageNumber > 1;
+    bool HasNext => CandidateSearchStateContainer.CandidateSearchParameters.PageNumber < CandidateSearchStateContainer.CandidateSearchParameters.TotalPages;
+    bool HasFirst => CandidateSearchStateContainer.CandidateSearchParameters.TotalCount > 0 
+                    && CandidateSearchStateContainer.CandidateSearchParameters.PageNumber > 1;
+    bool HasLast => CandidateSearchStateContainer.CandidateSearchParameters.TotalCount > 0 
+                    && CandidateSearchStateContainer.CandidateSearchParameters.PageNumber < CandidateSearchStateContainer.CandidateSearchParameters.TotalPages;
+
+
+    private List<PagingLink> _links;
+
+    protected override Task OnInitializedAsync()
+    {
+        return base.OnInitializedAsync();
+    }
+
+    protected override void OnParametersSet()
+    {
+        CreatePaginationLinks();
+        pagingSummaryFormat = $"pages: {CandidateSearchStateContainer.CandidateSearchParameters.TotalPages} (total {CandidateSearchStateContainer.CandidateSearchParameters.TotalCount} records)";
+        StateHasChanged();
+    }
+    private void CreatePaginationLinks()
+    {
+        _links = new List<PagingLink>();
+        _links.Add(new PagingLink(1, HasFirst, "<<"));
+        _links.Add(new PagingLink(CandidateSearchStateContainer.CandidateSearchParameters.PageNumber - 1, HasPrevious, "<"));
+        for (int i = 1; i <= CandidateSearchStateContainer.CandidateSearchParameters.TotalPages; i++)
+        {
+            if (i >= CandidateSearchStateContainer.CandidateSearchParameters.PageNumber - Spread && i <= CandidateSearchStateContainer.CandidateSearchParameters.PageNumber + Spread)
+            {
+                _links.Add(new PagingLink(i, CandidateSearchStateContainer.CandidateSearchParameters.PageNumber != i, i.ToString()));
+            }
+        }
+        _links.Add(new PagingLink(CandidateSearchStateContainer.CandidateSearchParameters.PageNumber + 1, HasNext, ">"));
+        _links.Add(new PagingLink(CandidateSearchStateContainer.CandidateSearchParameters.TotalPages, HasLast, ">>"));
+    }
+
+    private async Task OnSelectedPage(PagingLink link)
+    {
+        if (link.Page != CandidateSearchStateContainer.CandidateSearchParameters.PageNumber && link.Enabled)
+        {
+            CandidateSearchStateContainer.CandidateSearchParameters.PageNumber = link.Page;
+            await SelectedPage.InvokeAsync(link.Page);
+        }
+
+    }
+    private async Task OnSelectedSize()
+    {
+        
+        await SelectedSize.InvokeAsync(Size);
+    }
+}

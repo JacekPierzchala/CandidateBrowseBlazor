@@ -1,0 +1,96 @@
+﻿@page "/users/login"
+@inject IJSRuntime JSRuntime
+@inject IAuthenticationService AuthenticationService
+@inject NavigationManager NavigationManager
+@inject NotificationService NotificationService
+
+@if (LoggingProcessError)
+{
+    <RadzenAlert Title="@messageTitle" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
+        <RadzenText>@message</RadzenText>
+    </RadzenAlert>
+}
+@if (!LoggingProcessPending)
+{
+    <RadzenStack Gap="0" Class="rz-my-12 rz-mx-auto rz-border-radius-6 rz-shadow-10" Style="width: 100%; max-width: 450px; overflow: hidden;">
+        <RadzenCard Class="rz-shadow-0 rz-border-radius-0 rz-background-color-info rz-p-12" style="text-align: center;">
+            <RadzenText TextStyle="TextStyle.DisplayH4" TagName="TagName.H2" Class="rz-color-white rz-mb-0">Candidates Browser</RadzenText>
+        </RadzenCard>
+        <EditForm Model="LoginViewModel" OnValidSubmit="HandleLogin">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <RadzenCard>
+                <RadzenStack>
+                    <RadzenTextBox Placeholder="Email Address" @bind-Value="LoginViewModel.Email" />
+                    <RadzenPassword Placeholder="Password" @bind-Value="LoginViewModel.Password" />
+                    <RadzenButton class="mt-1" ButtonType="ButtonType.Submit"><RadzenIcon Icon="login" />Login</RadzenButton>
+                </RadzenStack>
+            </RadzenCard>
+        </EditForm>
+        <RadzenStack>
+            <RadzenButton Click="RouteToForgotPassword" Style="width:350px; align-self:center">Forgot you password?</RadzenButton>
+        </RadzenStack>
+        <RadzenCard Class="rz-background-color-base-300" style="text-align: center;">
+            <button  type="button" class="btn" @onclick="@HandleGoogleLogin"><img src="/img_templates/google_signin.png"></button> 
+        </RadzenCard>
+       <RadzenCard Class="rz-background-color-base-300" style="text-align: center;">
+            <RadzenText>Don't have account yet?</RadzenText>
+            <RadzenButton Click="RouteToRegister" class="mt-1" ButtonStyle="ButtonStyle.Secondary"><RadzenIcon Icon="person_add" />Go to Register</RadzenButton>
+        </RadzenCard>
+    </RadzenStack>
+
+}
+else
+{
+    <LoadingElement Message="Authorizing ..." />
+}
+
+@code {
+    LoginViewModel LoginViewModel = new();
+    string message = string.Empty;
+    string messageTitle = string.Empty;
+    bool LoggingProcessPending;
+    bool LoggingProcessError;
+
+    private async Task HandleLogin()
+    {
+        LoggingProcessPending = true;
+        LoggingProcessError = false;
+        StateHasChanged();
+
+        var response = await AuthenticationService.AuthenticateAsync(LoginViewModel);
+        if (response.Success)
+        {
+            NavigationManager.NavigateTo(UrlStatics.home);
+        }
+        else
+        {
+            message = response.ValidationErrors;
+            messageTitle = response.Message;
+            LoggingProcessError = true;
+        }
+        LoggingProcessPending = false;
+
+        StateHasChanged();
+    }
+
+    private void RouteToRegister()
+    {
+        NavigationManager.NavigateTo(UrlStatics.register);
+    }
+
+    private async Task HandleGoogleLogin()
+    {
+        var response = await AuthenticationService.GetGoogleAuthUrlAsync();
+        if (!response.Success)
+        {
+            NotificationService.Notify(new NotificationMessage() { Detail=response.Message });
+        }
+        NavigationManager.NavigateTo(response.Data, false);
+    }
+
+    private void RouteToForgotPassword()
+    {
+        NavigationManager.NavigateTo(UrlStatics.forgotPassword);
+    }
+}

@@ -1,0 +1,30 @@
+﻿@inject DialogService DialogService
+@page "/"
+@attribute [Authorize(Policy = PermissionStatics.CandidateRead)]
+
+<div class="container mt-1">
+    @if (LoadDataChanged)
+    {
+        <RadzenButton Text="Show filters" Icon="filter_list" ButtonStyle="ButtonStyle.Primary"
+                  Click="OpenOrder" />
+    }
+    <CandidatesList LoadDataChanged="@OnLoadDataChanged" />
+</div>
+
+@code
+{
+    bool LoadDataChanged;
+    public async Task OpenOrder()
+    {
+        await DialogService.OpenSideAsync<CandidatesSearchPanel>("Candidate search filters", null,
+         new SideDialogOptions { CloseDialogOnOverlayClick = false, Position = DialogPosition.Left, ShowMask = true });
+    }
+
+    private async Task OnLoadDataChanged(bool ended)
+    {
+        LoadDataChanged = ended;
+        StateHasChanged();
+    }
+}
+
+
