@@ -52,20 +52,21 @@
 
 @code {
     [Parameter]
-    public EventCallback<bool> LoadDataChanged { get; set; }
+    public EventCallback<Tuple<bool,bool>> LoadDataChanged { get; set; }
 
     public bool LoadDataSuccess { get; set; }
     private string ErrorMessage = string.Empty;
 
+  
+
     IEnumerable<CandidateListDto>? Candidates;
     protected async override Task OnInitializedAsync()
     {
-        await LoadDataChanged.InvokeAsync(false);
+        await LoadDataChanged.InvokeAsync(Tuple.Create(false, CandidateSearchStatecontainer.IsFilterered));
         HttpInterceptorService.RegisterEvent();
-        CandidateSearchStatecontainer.ClearSearchParameters();
         CandidateSearchStatecontainer.SearchTrigerred += async () => await SearchAsync();
         await SearchAsync();
-        await LoadDataChanged.InvokeAsync(true);
+ 
     }
 
     private async Task SearchAsync()
@@ -84,6 +85,8 @@
             Candidates = new List<CandidateListDto>();
             ErrorMessage = result.Message;
         }
+
+        await LoadDataChanged.InvokeAsync(Tuple.Create(true, CandidateSearchStatecontainer.IsFilterered));
         StateHasChanged();
     }
 

@@ -15,4 +15,9 @@ public class CandidateSearchStateContainer
         CandidateSearchParameters = new();
     }
 
+    public bool IsFilterered => !string.IsNullOrEmpty(CandidateSearchParameters.FirstName)
+        || !string.IsNullOrEmpty(CandidateSearchParameters.FirstName) 
+        || CandidateSearchParameters.Companies.Count>0
+        || CandidateSearchParameters.Projects.Count > 0;
+
 }

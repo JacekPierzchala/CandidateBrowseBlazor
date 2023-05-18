@@ -1,0 +1,32 @@
+﻿@inject IJSRuntime JSRuntime
+@attribute [Authorize(Policy = PermissionStatics.CandidateRead)]
+
+    <RadzenStack  Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" JustifyContent="JustifyContent.Start" Gap="1rem"  >
+
+       <RadzenImage Path="@Candidate?.ProfilePath"  Style="width: 255px; height: 250px; border-radius: 50%;" />
+        <RadzenStack Gap="0" Wrap="FlexWrap.Wrap">
+            <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Candidate</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body1"><b>@(Candidate?.FirstName + " " + Candidate?.LastName)</b></RadzenText>
+            <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">Date of Birth</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body1"><b>@Candidate?.DateOfBirth.ToString("yyyy-MM-dd")</b></RadzenText>
+            <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex flex-row rz-mt-4 rz-mb-0">Email</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body1"><b>@Candidate?.Email</b></RadzenText>
+        </RadzenStack>
+
+    </RadzenStack>
+    <RadzenStack JustifyContent="JustifyContent.Start" Gap="0" Class="rz-p-2" Wrap="FlexWrap.Wrap">
+        <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Description:</RadzenText>
+        <RadzenText TextStyle="TextStyle.Body1">@Candidate?.Description</RadzenText>
+    </RadzenStack>
+
+
+
+
+@code {
+    [Parameter]
+    public CandidateDetailsDto Candidate { get; set; }
+
+   
+   
+
+}
