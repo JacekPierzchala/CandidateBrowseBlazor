@@ -2,17 +2,12 @@
     <RadzenMenu>
         <AuthorizeView Policy=@PermissionStatics.CandidateRead>
             <Authorized>
-            <RadzenMenuItem class="m-1" Path="@UrlStatics.home" Text="Canidates" Icon="dashboard" />
+            <RadzenMenuItem class="m-1" Path="@UrlStatics.home" Text="Candidates" Icon="dashboard" />
             <RadzenMenuItem class="m-1" Path="counter" Text="User details" Icon="face" />
-                <RadzenProfileMenu class="ml-5">
-                    <Template>
-                        <RadzenIcon class="my-2" Icon="person"/>
-                    </Template>
-                    <ChildContent>
-                    <RadzenProfileMenuItem Path="@UrlStatics.logout" Icon="account_circle" Text="Log Out">
-                         </RadzenProfileMenuItem>
-                    </ChildContent>
-                </RadzenProfileMenu>
+            <RadzenMenuItem class="m-1"  Icon="person">
+                <RadzenMenuItem Path="@UrlStatics.logout" class="m-1" Text="Log Out" Icon="account_circle"/>
+            </RadzenMenuItem>
+   
             </Authorized>
             <NotAuthorized>
             </NotAuthorized>

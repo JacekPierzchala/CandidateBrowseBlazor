@@ -10,16 +10,15 @@
     <RadzenCard class="my-4" style="min-width:fit-content">
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
 
-           @* <RadzenCard class="rz-shadow-5 rz-my-6 rz-mx-auto"  >*@
-            <RadzenCard class="rz-shadow-5 rz-my-6" >
+           <RadzenCard class="rz-shadow-5 rz-my-5" >
                 <RadzenStack Orientation="Orientation.Horizontal"  JustifyContent="JustifyContent.Start" Gap="1rem" Class="rz-p-1 flex-row">
                     <RadzenImage Path="@Candidate?.ProfilePath" Style="width: 250px; height: 250px; border-radius: 50%;" />
-                    <RadzenStack Gap="0">
+                    <RadzenStack Gap="0" Wrap="FlexWrap.Wrap">
                         <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Candidate</RadzenText>
                         <RadzenText TextStyle="TextStyle.Body1"><b>@(Candidate?.FirstName + " " + Candidate?.LastName)</b></RadzenText>
                         <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">Date of Birth</RadzenText>
                         <RadzenText TextStyle="TextStyle.Body1"><b>@Candidate?.DateOfBirth.ToString("yyyy-MM-dd")</b></RadzenText>
-                        <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex flex-sm-row rz-mt-4 rz-mb-0">Email</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex flex-row rz-mt-4 rz-mb-0">Email</RadzenText>
                         <RadzenText TextStyle="TextStyle.Body1"><b>@Candidate?.Email</b></RadzenText>
                     </RadzenStack>
                 </RadzenStack>
