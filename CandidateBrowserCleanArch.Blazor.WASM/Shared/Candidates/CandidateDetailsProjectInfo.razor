@@ -1,0 +1,21 @@
+﻿@attribute [Authorize(Policy = PermissionStatics.CandidateRead)]
+
+<RadzenStack JustifyContent="JustifyContent.Start" Gap="1rem" Class="rz-p-1">
+    <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Projects:</RadzenText>
+    <ul class="timeline align-items-start mt-2 ml-5">
+        @foreach (var project in Projects)
+        {
+            <li>
+                <RadzenStack JustifyContent="JustifyContent.Start" Gap="0" Class="rz-p-2">
+                    <RadzenText TextStyle="TextStyle.Body1"><b>@(project.Project.ProjectName)</b></RadzenText>
+                </RadzenStack>
+            </li>
+        }
+    </ul>
+</RadzenStack>
+
+
+@code {
+    [Parameter]
+    public ICollection<CandidateProjectDto> Projects { get; set; }
+}

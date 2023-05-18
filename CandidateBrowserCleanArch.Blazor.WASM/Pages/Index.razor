@@ -3,17 +3,19 @@
 @attribute [Authorize(Policy = PermissionStatics.CandidateRead)]
 
 <div class="container mt-1">
-    @if (LoadDataChanged)
+    @if (IsLoadDataChanged)
     {
-        <RadzenButton Text="Show filters" Icon="filter_list" ButtonStyle="ButtonStyle.Primary"
-                  Click="OpenOrder" />
+        <RadzenButton Text="Show filters" Icon="@(IsFiltered?"filter_list":"filter_list_off")" ButtonStyle="ButtonStyle.Primary"
+                  Click="OpenOrder"/>
     }
-    <CandidatesList LoadDataChanged="@OnLoadDataChanged" />
+    <CandidatesList LoadDataChanged="OnLoadDataChanged"/>
+
 </div>
 
 @code
 {
-    bool LoadDataChanged;
+    bool IsLoadDataChanged;
+    bool IsFiltered;
     public async Task OpenOrder()
     {
         await DialogService.OpenSideAsync<CandidatesSearchPanel>("Candidate search filters", null,
@@ -28,9 +30,10 @@
              });
     }
 
-    private async Task OnLoadDataChanged(bool ended)
+    private async Task OnLoadDataChanged(Tuple<bool, bool> args)
     {
-        LoadDataChanged = ended;
+        IsLoadDataChanged = args.Item1;
+        IsFiltered = args.Item2;
         StateHasChanged();
     }
 }
