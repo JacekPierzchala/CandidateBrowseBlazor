@@ -17,7 +17,15 @@
     public async Task OpenOrder()
     {
         await DialogService.OpenSideAsync<CandidatesSearchPanel>("Candidate search filters", null,
-         new SideDialogOptions { CloseDialogOnOverlayClick = false, Position = DialogPosition.Left, ShowMask = true });
+         new SideDialogOptions
+             {
+                 CloseDialogOnOverlayClick = false,
+                 Position = DialogPosition.Left,
+                 ShowMask = true,
+                 ShowTitle = true,
+                 Height = "600px;",
+                 Width = "400px;"
+             });
     }
 
     private async Task OnLoadDataChanged(bool ended)
