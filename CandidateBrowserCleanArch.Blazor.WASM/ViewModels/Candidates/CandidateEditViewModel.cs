@@ -1,10 +1,11 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace CandidateBrowserCleanArch.Blazor.WASM.ViewModels;
 
-public class RegisterViewModel
+public class CandidateEditViewModel
 {
+    public int Id { get; set; }
+
     [Required]
     [MinLength(5, ErrorMessage = $"{nameof(FirstName)} should have min 5 characters")]
     [MaxLength(20, ErrorMessage = $"{nameof(FirstName)} should have max 20 characters")]
@@ -20,14 +21,13 @@ public class RegisterViewModel
     [EmailAddress(ErrorMessage = "Invalid email adress format")]
     public string Email { get; set; }
 
-    [Required]
-    [MinLength(8, ErrorMessage = $"{nameof(Password)} should have min 8 characters")]
-    [RegularExpression(@"^(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$",
-    ErrorMessage = "Password must contain at least one uppercase letter, one digit, and one special character, and be at least 8 characters long.")]
-    public string Password { get; set; }
+    [DataType(DataType.Date),Required,CandidateDateOfBirthValidation]
+    public DateTime DateOfBirth { get; set; }
+    public string Description { get; set; }
+    public string? ProfilePicture { get; set; }
+    public string? ProfilePictureOld { get; set; }
+    public string? ProfilePath { get; set; }
 
-    [Required]
-    [Compare(nameof(Password),ErrorMessage =$"{nameof(ConfirmPassword)} must match {nameof(Password)}")]
-    [Display(Name = "Confirm Password")]
-    public string ConfirmPassword { get; set; }
+    public string? ProfilePictureData { get; set; }
+
 }

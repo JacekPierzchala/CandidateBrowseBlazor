@@ -1,10 +1,10 @@
 ﻿@inject CandidateSearchStateContainer CandidateSearchStateContainer
 
-<RadzenStack Orientation="Orientation.Horizontal"  AlignItems="AlignItems.Center">
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
     <RadzenText TextStyle="TextStyle.Overline">Items per page:</RadzenText>
     <RadzenDropDown @bind-Value=@Size Data=@sizes Style="max-width: 80px; min-width:75px" Change="@(async()=>await OnSelectedSize())" />
     <RadzenText Style="min-width:120px" TextStyle="TextStyle.Overline">@pagingSummaryFormat</RadzenText>
-    <RadzenStack Orientation="Orientation.Horizontal" class="rz-border-primary-lighter rz-border-radius-2" AlignItems="AlignItems.Center">
+    <RadzenStack Orientation="Orientation.Horizontal" class="rz-border-primary-lighter rz-border-radius-2" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
         
         @foreach (var link in _links)
         {
@@ -75,8 +75,7 @@
 
     }
     private async Task OnSelectedSize()
-    {
-        
+    {       
         await SelectedSize.InvokeAsync(Size);
     }
 }

@@ -54,8 +54,19 @@ builder.Services.AddScoped<ICompaniesService, CompaniesService>();
 
 builder.Services.AddScoped<CandidateSearchStateContainer>();
 
-builder.Services.AddAuthorizationCore(options=>options.AddPolicy(PermissionStatics.CandidateRead, policy =>
-                    policy.RequireClaim(CustomClaimTypes.Permission, PermissionStatics.CandidateRead)));
+builder.Services.AddAuthorizationCore(options =>
+{
+    options.AddPolicy(PermissionStatics.CandidateRead, policy =>
+                        policy.RequireClaim(CustomClaimTypes.Permission, PermissionStatics.CandidateRead));
+    options.AddPolicy(PermissionStatics.CandidateDelete, policy =>
+            policy.RequireClaim(CustomClaimTypes.Permission, PermissionStatics.CandidateDelete));
+    options.AddPolicy(PermissionStatics.CandidateCreate, policy =>
+         policy.RequireClaim(CustomClaimTypes.Permission, PermissionStatics.CandidateCreate));
+    options.AddPolicy(PermissionStatics.CandidateUpdate, policy =>
+         policy.RequireClaim(CustomClaimTypes.Permission, PermissionStatics.CandidateUpdate));
+
+});
+
 
 
 builder.Services.AddHttpClientInterceptor();

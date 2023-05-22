@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Blazored.LocalStorage;
 using CandidateBrowserCleanArch.Blazor.WASM.StateContainers;
+using CandidateBrowserCleanArch.Blazor.WASM.ViewModels;
 using CandidateBrowserCleanArch.Blazor.WASM.WebServices.Authenication;
 using CandidateBrowserCleanArch.Blazor.WASM.WebServices.Base;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -62,6 +63,31 @@ public class CandidatesService : BaseHttpService, ICandidatesService
             if (await GetBearerTokenAsync())
             {
                 var resultApi = await _client.CandidatesGET2Async(candidateId, ApiVersion);
+                response.Success = resultApi.Success;
+                response.Data = resultApi.Data;
+            }
+            else
+            {
+                await _authenticationService.LogOut();
+            }
+        }
+        catch (ApiException ex)
+        {
+            response = ConvertApiExceptions<CandidateDetailsDto>(ex);
+        }
+
+        return response;
+    }
+
+    public async Task<Response<CandidateDetailsDto>> UpdateCandidateMainInfoAsync(CandidateEditViewModel candidate)
+    {
+        var response = new Response<CandidateDetailsDto>();
+        try
+        {
+            if (await GetBearerTokenAsync())
+            {
+
+                var resultApi = await _client.CandidatesPUTAsync(candidate.Id, ApiVersion,_mapper.Map<CandidateUpdateDto>(candidate));
                 response.Success = resultApi.Success;
                 response.Data = resultApi.Data;
             }
