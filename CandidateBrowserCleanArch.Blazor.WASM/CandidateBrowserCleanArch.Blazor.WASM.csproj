@@ -39,6 +39,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="wwwroot\js\" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="WebServices\Base\Swagger.json">
       <Generator>NSwagCodeGenerator</Generator>
       <LastGenOutput>Swagger.cs</LastGenOutput>
@@ -51,10 +55,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Swagger.json</DependentUpon>
     </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\js\" />
   </ItemGroup>
 
 </Project>

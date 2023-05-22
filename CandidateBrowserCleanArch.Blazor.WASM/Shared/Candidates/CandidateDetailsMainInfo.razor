@@ -1,9 +1,22 @@
-﻿@inject IJSRuntime JSRuntime
+﻿@inject AuthenticationStateProvider AuthenticationStateProvider;
+@inject DialogService DialogService
+@inject ICandidatesService CandidatesService
+@inject NotificationService NotificationService
+@inject IMapper mapper
 @attribute [Authorize(Policy = PermissionStatics.CandidateRead)]
 
-    <RadzenStack  Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" JustifyContent="JustifyContent.Start" Gap="1rem"  >
+@if(!updatePending)
+{
+    @if (mainInfoDialogOpen)
+    {
+            <CandidateMainInfoDialog Close="OnCloseAsync" Candidate="candidateEdit" SaveCandidateAsync="OnSaveCandidateAsync" />
+    }
 
-       <RadzenImage Path="@Candidate?.ProfilePath"  Style="width: 255px; height: 250px; border-radius: 50%;" />
+    <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" JustifyContent="JustifyContent.Start" Gap="1rem">
+        <AuthorizeView Policy="@PermissionStatics.CandidateUpdate">
+            <RadzenButton Click="EditCandidateAsync" Icon="edit" Style="height:25px;" />
+        </AuthorizeView>
+        <RadzenImage Path="@Candidate?.ProfilePath" Style="width: 255px; height: 250px; border-radius: 50%;" />
         <RadzenStack Gap="0" Wrap="FlexWrap.Wrap">
             <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Candidate</RadzenText>
             <RadzenText TextStyle="TextStyle.Body1"><b>@(Candidate?.FirstName + " " + Candidate?.LastName)</b></RadzenText>
@@ -18,6 +31,12 @@
         <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Description:</RadzenText>
         <RadzenText TextStyle="TextStyle.Body1">@Candidate?.Description</RadzenText>
     </RadzenStack>
+}
+else
+{
+    <LoadingElement Message="Updating candidate..."/>
+}
+
 
 
 
@@ -25,8 +44,56 @@
 @code {
     [Parameter]
     public CandidateDetailsDto Candidate { get; set; }
+    bool mainInfoDialogOpen;
+    CandidateEditViewModel candidateEdit;
+    bool updatePending;
 
-   
-   
+
+
+    public async Task EditCandidateAsync()
+    {
+        candidateEdit = mapper.Map<CandidateEditViewModel>(Candidate);
+        mainInfoDialogOpen = true;
+    }
+
+    private async Task OnCloseAsync()
+    {
+        mainInfoDialogOpen = false;
+    }
+
+    private async Task OnSaveCandidateAsync(CandidateEditViewModel candidate)
+    {
+        updatePending = true;
+        var response=await CandidatesService.UpdateCandidateMainInfoAsync(candidate);
+        if(response.Success)
+        {
+            Candidate = response.Data;
+            NotificationService
+           .Notify(new NotificationMessage
+           {
+               Severity = NotificationSeverity.Success,
+               Duration = 4000,
+               Summary = "Success",
+               Detail = $"{Candidate.FirstName} {Candidate.LastName} details updated"
+           });
+        }
+        else
+        {
+             NotificationService
+            .Notify(new NotificationMessage
+              {
+                  Severity = NotificationSeverity.Error,
+                  Duration = 4000,
+                  Summary = "Error",
+                  Detail = $"Update has failed:{response.Message}"
+              });
+        }
+        updatePending = false;
+        mainInfoDialogOpen = false;
+    }
+
+
+
+
 
 }

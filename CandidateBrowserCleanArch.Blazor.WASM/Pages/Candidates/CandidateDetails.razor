@@ -5,12 +5,12 @@
 @implements IDisposable
 @attribute [Authorize(Policy = PermissionStatics.CandidateRead)]
 
-@if (Candidate != null)
+@if (Candidate != null && loadFinished)
 {
     <RadzenCard class="my-4" style="min-width:fit-content">
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
 
-           <RadzenCard class="rz-shadow-5 rz-my-6" >
+            <RadzenCard class="rz-shadow-5 rz-my-3 rz-mx-auto">
                <CandidateDetailsMainInfo Candidate="@Candidate"/>
             </RadzenCard>
             <RadzenCard class="rz-shadow-5 rz-my-3 rz-mx-auto">
@@ -23,6 +23,10 @@
     </RadzenCard>
 
 }
+else if (loadFinished)
+{
+    <NotFoundElement Message="@message" />
+}
 else
 {
     <LoadingElement Message="Loading candidate details..." />
@@ -34,13 +38,18 @@ else
     public int Id { get; set; }
     CandidateDetailsDto Candidate;
     bool loadDataResult;
+    bool loadFinished;
+    string message = string.Empty;
     protected async override Task OnInitializedAsync()
     {
+        loadFinished = false;
         HttpInterceptorService.RegisterEvent();
 
         var request = await CandidatesService.GetCandidateDetailsAsync(Id);
         loadDataResult = request.Success;
         Candidate = request.Data;
+        message = request.Message;
+        loadFinished = true;
     }
 
 
