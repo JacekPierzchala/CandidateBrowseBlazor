@@ -15,6 +15,10 @@ namespace CandidateBrowserCleanArch.Blazor.WASM.Mappers
             CreateMap<CandidateEditViewModel,CandidateUpdateDto>()
                  .ForMember(c => c.DateOfBirth, map => map.MapFrom(ca => ca.DateOfBirth.Date))
                 .ReverseMap();
+
+            CreateMap<CandidateEditViewModel, CandidateCreateDto>()
+             .ForMember(c => c.DateOfBirth, map => map.MapFrom(ca => ca.DateOfBirth.Date))
+            .ReverseMap();
         }
     }
 }

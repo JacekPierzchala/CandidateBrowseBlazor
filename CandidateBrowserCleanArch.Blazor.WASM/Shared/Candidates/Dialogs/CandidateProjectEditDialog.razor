@@ -1,0 +1,67 @@
+﻿@inject IProjectsService ProjectsService
+@attribute [Authorize(Policy = PermissionStatics.CandidateUpdate)]
+<div class="modal fade show" id="myModal" style="display:block; background-color: rgba(10,10,10,.8); " aria-modal="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <RadzenButton Click="OnClosedAsync" Icon="close" />
+            </div>
+            <div class="modal-body">
+                @if (Projects != null)
+                {
+                    <EditForm Model="Model" OnValidSubmit="OnSaveProjectAsync">
+                        <RadzenStack>
+
+                            <RadzenDropDown Placeholder="Project" @bind-Value="Model.ProjectId" Data=@Projects TextProperty="ProjectName" ValueProperty="Id" />
+
+                        </RadzenStack>
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+                        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" Class="rz-mt-8 rz-mb-4">
+                            <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Save" />
+                        </RadzenStack>
+                    </EditForm>
+                }
+                else
+                {
+                    <LoadingElement Message="loading projects..." />
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public EventCallback Close { get; set; }
+
+    [Parameter]
+    public EventCallback<CandidateProjectEditModel> SaveProject { get; set; }
+
+    [Parameter]
+    public CandidateProjectEditModel Model { get; set; }
+
+
+    IEnumerable<ReadProjectDto> Projects;
+
+    protected async override Task OnInitializedAsync()
+    {
+        var resultCompany = await ProjectsService.GetAllActiveProjectsAsync(false);
+        if (resultCompany.Success)
+        {
+            Projects = resultCompany?.Data;
+        }
+    }
+
+    private async Task OnSaveProjectAsync()
+    {
+        await SaveProject.InvokeAsync(Model);
+    }
+    private async Task OnClosedAsync()
+    {
+        await Close.InvokeAsync();
+    }
+
+
+}

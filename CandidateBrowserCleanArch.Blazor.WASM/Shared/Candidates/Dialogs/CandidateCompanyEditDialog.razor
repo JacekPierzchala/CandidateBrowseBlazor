@@ -1,0 +1,89 @@
+﻿@inject ICompaniesService CompaniesService
+@attribute [Authorize(Policy = PermissionStatics.CandidateUpdate)]
+<div class="modal fade show" id="myModal" style="display:block; background-color: rgba(10,10,10,.8); " aria-modal="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <RadzenButton Click="OnClosedAsync" Icon="close" />
+            </div>
+            <div class="modal-body">
+                @if (Companies != null)
+                {
+                    <EditForm Model="Model" OnValidSubmit="OnSaveCompanyAsync">
+                        <RadzenStack>
+      
+                            <RadzenDropDown Placeholder="Company"  @bind-Value="Model.CompanyId" Data=@Companies TextProperty="CompanyName" ValueProperty="Id" />
+                            <RadzenLabel Text="Date Start" Style="font-size:small" />
+                            <RadzenDatePicker DateFormat="yyyy-MM-dd" @bind-Value="@Model.DateStart" Placeholder="Date Start" />
+                            <RadzenLabel Text="Date End" Style="font-size:small" />
+                            <RadzenStack Orientation="Orientation.Horizontal">
+                           <RadzenLabel Text="Current"/>
+                                <RadzenCheckBox @bind-Value="current" Change="@((bool args)=>OnChange(args))" Name="Current" />
+                                @if(!current)
+                                {
+                                    <RadzenDatePicker DateFormat="yyyy-MM-dd" @bind-Value="@Model.DateEnd" Placeholder="Date End" />
+                                }
+                               
+                            </RadzenStack>
+                           
+                            <RadzenLabel Text="Position" Style="font-size:small" />
+                            <RadzenTextBox @bind-Value="@Model.Position" Placeholder="Position" />
+                        </RadzenStack>
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+                        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" Class="rz-mt-8 rz-mb-4">
+                            <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Save" />
+                        </RadzenStack>
+                    </EditForm>
+
+                }
+                else
+                {
+                    <LoadingElement Message="loading companies..." />
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    [Parameter]
+    public EventCallback Close { get; set; }
+
+    [Parameter]
+    public EventCallback<CandidateCompanyEditViewModel> SaveCompany { get; set; }
+
+    [Parameter]
+    public CandidateCompanyEditViewModel Model { get; set; }
+
+
+    IEnumerable<ReadCompanyDto> Companies;
+    //int selectedCompany;
+    bool current;
+
+    protected async override Task OnInitializedAsync()
+    {
+        var resultCompany = await CompaniesService.GetAllActiveCompaniesAsync(false);
+        if (resultCompany.Success)
+        {
+            Companies = resultCompany?.Data;
+        }
+        current = !Model.DateEnd.HasValue;
+    }
+
+    private async Task OnSaveCompanyAsync()
+    {
+        await SaveCompany.InvokeAsync(Model);
+    }
+    private async Task OnClosedAsync()
+    {
+        await Close.InvokeAsync();
+    }
+
+    private void OnChange(bool current)
+    {
+        Model.DateEnd = current ? Model.DateEnd = null : DateTime.Now;
+    }
+}

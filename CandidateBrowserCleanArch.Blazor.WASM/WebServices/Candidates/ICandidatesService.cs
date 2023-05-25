@@ -10,4 +10,5 @@ public interface ICandidatesService
         (CandidateSearchParameters searchParameters);
     Task<Response<CandidateDetailsDto>> GetCandidateDetailsAsync(int candidateId);
     Task<Response<CandidateDetailsDto>>UpdateCandidateMainInfoAsync(CandidateEditViewModel candidate);
+    Task<Response<CandidateDetailsDto>> AddCandidateMainInfoAsync(CandidateEditViewModel candidate);
 }

@@ -1,0 +1,75 @@
+﻿@inject ICandidatesService CandidatesService
+@inject NotificationService NotificationService
+@inject IMapper mapper
+
+@attribute [Authorize(Policy = PermissionStatics.CandidateCreate)]
+<div class="modal fade show" id="myModal" style="display:block; background-color: rgba(10,10,10,.8); " aria-modal="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content" style="width:600px; min-height:380px">
+            <div class="modal-header">
+                <RadzenText Text="@($"{(Candidate.Id==0? "Add new Candidate":$"{Candidate.FirstName} {Candidate.LastName}")}")" />  
+                <RadzenButton Click="OnCloseAsync" Icon="close" />
+            </div>
+            <div class="modal-body">
+                <RadzenSteps @ref="_radzenSteps">
+                     <Steps>
+                        <RadzenStepsItem Text="Canidate Main Info" Disabled="@(Candidate.Id!=0)">
+                            <CandidateMainInfoEdit Candidate="Candidate"  SaveCandidateAsync="OnSaveCandidateAsync" />
+                        </RadzenStepsItem>
+                        <RadzenStepsItem  Text="Companies" Disabled="@(Candidate.Id==0)">
+                            <CandidateDetailsCompanyInfo CandidateId="Candidate.Id" />
+                        </RadzenStepsItem>
+                        <RadzenStepsItem Text="Projects" Disabled="@(Candidate.Id==0)">
+                            <CandidateDetailsProjectInfo CandidateId="Candidate.Id" />
+                        </RadzenStepsItem>
+                     </Steps>
+
+                </RadzenSteps>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<CandidateEditViewModel> Close { get; set; }
+
+    [Parameter]
+    public CandidateEditViewModel Candidate { get; set; }
+
+    RadzenSteps? _radzenSteps;
+
+    private async Task OnCloseAsync()
+    {
+        await Close.InvokeAsync(Candidate);
+    }
+
+    private async Task OnSaveCandidateAsync(CandidateEditViewModel candidate)
+    {
+        var response=await CandidatesService.AddCandidateMainInfoAsync(candidate);
+        if (response.Success)
+        {
+            Candidate = mapper.Map<CandidateEditViewModel>(response.Data);
+            _radzenSteps.SelectedIndex = 1;
+            //StateHasChanged();
+
+        }
+        else
+        {
+            //handle
+        }
+        //else
+        //{
+        //    NotificationService
+        //   .Notify(new NotificationMessage
+        //       {
+        //           Severity = NotificationSeverity.Error,
+        //           Duration = 4000,
+        //           Summary = "Error",
+        //           Detail = $"Update has failed:{response.Message}"
+        //       });
+        //}
+    }
+
+
+}

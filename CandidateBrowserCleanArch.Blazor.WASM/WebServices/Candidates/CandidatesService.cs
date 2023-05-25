@@ -100,7 +100,31 @@ public class CandidatesService : BaseHttpService, ICandidatesService
         {
             response = ConvertApiExceptions<CandidateDetailsDto>(ex);
         }
-
         return response;
     }
+
+    public async Task<Response<CandidateDetailsDto>> AddCandidateMainInfoAsync(CandidateEditViewModel candidate)
+    {
+        var response = new Response<CandidateDetailsDto>();
+        try
+        {
+            if (await GetBearerTokenAsync())
+            {
+
+                var resultApi = await _client.CandidatesPOSTAsync(ApiVersion, _mapper.Map<CandidateCreateDto>(candidate));
+                response.Success = resultApi.Success;
+                response.Data = resultApi.Data;
+            }
+            else
+            {
+                await _authenticationService.LogOut();
+            }
+        }
+        catch (ApiException ex)
+        {
+            response = ConvertApiExceptions<CandidateDetailsDto>(ex);
+        }
+        return response;
+    }
+
 }

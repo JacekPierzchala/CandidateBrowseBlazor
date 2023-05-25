@@ -30,7 +30,7 @@ builder.Services.AddHttpClient<ICandidateBrowserWebAPIClient, CandidateBrowserWe
 
 
 
-builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+
 
 builder.Services.AddScoped<ApiAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(opt =>
@@ -46,10 +46,12 @@ builder.Services.AddScoped<DialogService>();
 
 builder.Services.AddAutoMapper(typeof(Program));
 
-
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<ICandidatesService, CandidatesService>();
 builder.Services.AddScoped<IProjectsService, ProjectsService>();
 builder.Services.AddScoped<ICompaniesService, CompaniesService>();
+builder.Services.AddScoped<ICandidateCompanyService, CandidateCompanyService>();
+builder.Services.AddScoped<ICandidateProjectService, CandidateProjectService>();
 
 
 builder.Services.AddScoped<CandidateSearchStateContainer>();

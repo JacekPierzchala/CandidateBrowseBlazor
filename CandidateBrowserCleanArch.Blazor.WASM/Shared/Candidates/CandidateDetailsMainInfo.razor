@@ -9,7 +9,7 @@
 {
     @if (mainInfoDialogOpen)
     {
-            <CandidateMainInfoDialog Close="OnCloseAsync" Candidate="candidateEdit" SaveCandidateAsync="OnSaveCandidateAsync" />
+            <CandidateMainInfoDialog Close="OnCloseAsync" CandidateId="Candidate.Id" Candidate="candidateEdit" SaveCandidateAsync="OnSaveCandidateAsync" />
     }
 
     <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" JustifyContent="JustifyContent.Start" Gap="1rem">
@@ -52,6 +52,7 @@ else
 
     public async Task EditCandidateAsync()
     {
+
         candidateEdit = mapper.Map<CandidateEditViewModel>(Candidate);
         mainInfoDialogOpen = true;
     }
@@ -63,33 +64,37 @@ else
 
     private async Task OnSaveCandidateAsync(CandidateEditViewModel candidate)
     {
-        updatePending = true;
-        var response=await CandidatesService.UpdateCandidateMainInfoAsync(candidate);
-        if(response.Success)
+        if (candidate.Id != null && candidate.Id > 0)
         {
-            Candidate = response.Data;
-            NotificationService
-           .Notify(new NotificationMessage
-           {
-               Severity = NotificationSeverity.Success,
-               Duration = 4000,
-               Summary = "Success",
-               Detail = $"{Candidate.FirstName} {Candidate.LastName} details updated"
-           });
+            updatePending = true;
+            var response = await CandidatesService.UpdateCandidateMainInfoAsync(candidate);
+            if (response.Success)
+            {
+                Candidate = response.Data;
+                NotificationService
+               .Notify(new NotificationMessage
+                   {
+                       Severity = NotificationSeverity.Success,
+                       Duration = 4000,
+                       Summary = "Success",
+                       Detail = $"{Candidate.FirstName} {Candidate.LastName} details updated"
+                   });
+            }
+            else
+            {
+                NotificationService
+               .Notify(new NotificationMessage
+                   {
+                       Severity = NotificationSeverity.Error,
+                       Duration = 4000,
+                       Summary = "Error",
+                       Detail = $"Update has failed:{response.Message}"
+                   });
+            }
+            updatePending = false;
+            mainInfoDialogOpen = false;
         }
-        else
-        {
-             NotificationService
-            .Notify(new NotificationMessage
-              {
-                  Severity = NotificationSeverity.Error,
-                  Duration = 4000,
-                  Summary = "Error",
-                  Detail = $"Update has failed:{response.Message}"
-              });
-        }
-        updatePending = false;
-        mainInfoDialogOpen = false;
+
     }
 
 
