@@ -1,0 +1,32 @@
+﻿<div class="modal fade show" id="myModal" style="display:block; background-color: rgba(10,10,10,.8); " aria-modal="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                        <RadzenText Text="@Message"/>
+            </div>
+            <div class="modal-body">
+                <RadzenStack Orientation="Orientation.Horizontal" >
+                    <RadzenButton Text="Yes" Icon="done" Click="@(()=>OnConfirmationSelected(true))" />
+                    <RadzenButton Text="No" Icon="close" Click="@(()=>OnConfirmationSelected(false))" />
+                </RadzenStack>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public string Message { get; set; }
+    [Parameter]
+    public int Id { get; set; }
+    [Parameter]
+    public EventCallback<Tuple<bool,int >> OnConfirmation { get; set; }
+
+    private async Task OnConfirmationSelected(bool confirmation)
+    {
+        var message =Tuple.Create(confirmation, Id);
+        await OnConfirmation.InvokeAsync(message);
+
+    }
+}

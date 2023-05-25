@@ -1,21 +1,224 @@
-﻿@attribute [Authorize(Policy = PermissionStatics.CandidateRead)]
-
+﻿@inject ICandidateCompanyService CandidateCompanyService
+@inject IMapper mapper
+@inject IJSRuntime JSRuntime
+@inject NotificationService NotificationService
+@inject DialogService DialogService
+@attribute [Authorize(Policy = PermissionStatics.CandidateRead)]
+@if (confirmationDialogOpen)
+{
+    <DeleteConfirmation Message="@confirmationMessage" OnConfirmation="OnDeleteConfirmationReceived" Id="companyToDelete" />
+}
+@if (companyDialogOpen)
+{
+    <CandidateCompanyEditDialog SaveCompany="@(async(CandidateCompanyEditViewModel model)=>await OnSaveCompanyAsync(model))"
+                            Model="company" Close="OnCompanyClose" />
+}
 <RadzenStack JustifyContent="JustifyContent.Start" Gap="1rem" Class="rz-p-1">
-    <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Companies:</RadzenText>
-    <ul class="timeline align-items-start mt-2 ml-5">
-        @foreach (var company in Companies)
-        {
-            <li>
-                <RadzenStack JustifyContent="JustifyContent.Start" Gap="0" Class="rz-p-2">
-                    <RadzenText TextStyle="TextStyle.Body1"><b>@($"{company.Company.CompanyName}: {@company.Position}")</b></RadzenText>
-                    <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">@(@company.DateStart.ToString("yyyy-MM-dd") + " : " + (@company.DateEnd.HasValue ? @company.DateEnd?.ToString("yyyy-MM-dd") : "Current"))</RadzenText>
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenText TextStyle="TextStyle.Overline" Text="Companies:" class="rz-display-flex rz-mt-2 rz-my-0" />
+        <RadzenButton Icon="add" Text="Add Company" Click="@(async()=>await OnCompanyOpen(null))" />
+    </RadzenStack>
+    @if (Companies != null)
+    {
+        <ul class="timeline align-items-start mt-2 ">
+
+            @foreach (var company in Companies)
+            {
+                <li>
+                    <RadzenStack JustifyContent="JustifyContent.Start" Gap="0" Wrap="FlexWrap.Wrap" class="mb-2">
+                        <RadzenText TextStyle="TextStyle.Body1"><b>@($"{company.Company.CompanyName}: {@company.Position}")</b></RadzenText>
+                        <RadzenStack Wrap="FlexWrap.Wrap" Orientation="Orientation.Horizontal">
+                            <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0" style="width:145px">
+                                @(@company.DateStart.ToString("yyyy-MM-dd") + " : " + (@company.DateEnd.HasValue ? @company.DateEnd?.ToString("yyyy-MM-dd") : "Current"))
+                            </RadzenText>
+                            <AuthorizeView Policy="@PermissionStatics.CandidateUpdate">
+                                <RadzenButton class="ms-1" Icon="edit" Click="@(async()=>await OnCompanyOpen(company))" />
+                                <RadzenButton class="ms-1" Click="@(async()=>await OnCompanyDelete(company))" Icon="delete" />
+                            </AuthorizeView>
+                        </RadzenStack>
                     </RadzenStack>
+
                 </li>
-        }
-    </ul>
+            }
+        </ul>
+    }
+
 </RadzenStack>
 
 @code {
     [Parameter]
     public ICollection<CandidateCompanyDto> Companies { get; set; }
+    [Parameter]
+    public int CandidateId { get; set; }
+
+    bool companyDialogOpen;
+
+    bool confirmationDialogOpen;
+    string? confirmationMessage;
+    int companyToDelete;
+    CandidateCompanyEditViewModel company;
+
+    private async Task OnCompanyDelete(CandidateCompanyDto company)
+    {
+        confirmationMessage = $"Are you sure to delete this company:{company.Company.CompanyName}?";
+        companyToDelete = company.Id;
+        confirmationDialogOpen = true;
+        //var decision = await JSRuntime.InvokeAsync<bool>("confirm", $"Are you sure to delete this company:{company.Company.CompanyName}?");
+
+        //if (decision! != null && (bool)decision)
+        //{
+        //    var result = await CandidateCompanyService.DeleteCandidateCompanyAsync(company.Id);
+        //    if (result.Success)
+        //    {
+
+        //        Companies.Remove(company);
+        //        NotificationService
+        //       .Notify(new NotificationMessage
+        //           {
+        //               Severity = NotificationSeverity.Success,
+        //               Duration = 4000,
+        //               Summary = "Success",
+        //               Detail = $"Removal success"
+        //           });
+        //    }
+        //    else
+        //    {
+        //        NotificationService
+        //           .Notify(new NotificationMessage
+        //               {
+        //                   Severity = NotificationSeverity.Error,
+        //                   Duration = 4000,
+        //                   Summary = "Error",
+        //                   Detail = $"Update has failed:{result.Message}"
+        //               });
+        //    }
+
+        //}
+    }
+
+    private async Task OnDeleteConfirmationReceived(Tuple<bool, int> message)
+    {
+        if (message.Item1)
+        {
+            var result = await CandidateCompanyService.DeleteCandidateCompanyAsync(message.Item2);
+            if (!result.Success)
+            {
+                NotificationService
+                                .Notify(new NotificationMessage
+                                    {
+                                        Severity = NotificationSeverity.Error,
+                                        Duration = 4000,
+                                        Summary = "Error",
+                                        Detail = $"Update has failed:{result.Message}"
+                                    });
+
+            }
+            var company = Companies.FirstOrDefault(co => co.Id == message.Item2);
+            if (company != null)
+            {
+                Companies.Remove(company);
+            }
+        }
+        confirmationDialogOpen = false;
+    }
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        if (Companies == null)
+        {
+            var response = await CandidateCompanyService.GetCompaniesByCandidateAsync(CandidateId);
+            if (response.Success)
+            {
+                Companies = response.Data != null ? response.Data.ToList() : new List<CandidateCompanyDto>();
+            }
+            else
+            {
+                //handle
+            }
+        }
+        Companies = Companies.OrderByDescending(c => c.DateStart).ToList();
+    }
+ 
+    private async Task OnCompanyClose()
+    {
+        companyDialogOpen = false;
+    }
+
+    private async Task OnCompanyOpen(CandidateCompanyDto? candidateCompany)
+    {
+
+        if (candidateCompany != null)
+        {
+            company = mapper.Map<CandidateCompanyEditViewModel>(candidateCompany);
+        }
+        else
+        {
+            company = new();
+        }
+        company.CandidateId = CandidateId;
+        companyDialogOpen = true;
+    }
+
+    private async Task OnSaveCompanyAsync(CandidateCompanyEditViewModel model)
+    {
+        var result = await ProcessCompanyChange(model);
+        if (result.result)
+        {
+            NotificationService
+               .Notify(new NotificationMessage
+                   {
+                       Severity = NotificationSeverity.Success,
+                       Duration = 4000,
+                       Summary = "Success",
+                       Detail = $"Update has succeeded"
+                   });
+        }
+        else
+        {
+            NotificationService
+               .Notify(new NotificationMessage
+                   {
+                       Severity = NotificationSeverity.Error,
+                       Duration = 4000,
+                       Summary = "Error",
+                       Detail = $"Update has failed:{result.message}"
+                   });
+        }
+        companyDialogOpen = false;
+    }
+
+    private async Task<(bool result, string message)> ProcessCompanyChange(CandidateCompanyEditViewModel model)
+    {
+        (bool result, string message) result = new();
+        if (model.Id > 0)
+        {
+            var resultService = await CandidateCompanyService.UpdateCandidateCompanyAsync(model);
+            if (resultService.Success)
+            {
+                var company = Companies.FirstOrDefault(co => co.Id == resultService.Data.Id);
+                if (company != null)
+                {
+                    Companies.Remove(company);
+                }
+                Companies.Add(resultService.Data);
+            }
+
+            result.result = resultService.Success;
+            result.message = resultService.Message;
+        }
+        else
+        {
+            var resultService = await CandidateCompanyService.AddCandidateCompanyAsync(model);
+            if (resultService.Success)
+            {
+                Companies.Add(resultService.Data);
+            }
+            result.result = resultService.Success;
+            result.message = resultService.Message;
+
+        }
+        Companies = Companies.OrderByDescending(c => c.DateStart).ToList();
+        return result;
+    }
 }

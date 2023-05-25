@@ -2,148 +2,44 @@
 @inject DialogService DialogService
 
 <div class="modal fade show" id="myModal" style="display:block; background-color: rgba(10,10,10,.8); " aria-modal="true" role="dialog">
-    <div class="modal-dialog" >
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
+                <RadzenText Text="@($"Edit {Candidate.FirstName} {Candidate.LastName} details")" />
                 <RadzenButton Click="OnCloseAsync" Icon="close" />
             </div>
             <div class="modal-body">
-                <EditForm Model="Candidate" OnValidSubmit="OnSaveCandidateAsync">
-                    <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" JustifyContent="JustifyContent.Start" Gap="1rem">
+                <CandidateMainInfoEdit Candidate="Candidate" SaveCandidateAsync="OnSaveCandidateAsync" />
 
-                        <RadzenImage Path="@Candidate?.ProfilePath" Style="width: 255px; height: 250px; border-radius: 50%;" />
-                        <InputFile OnChange="HandlePhotoChange"  />
-                  
-                        <RadzenStack Wrap="FlexWrap.Wrap" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Stretch">
-                            <RadzenFieldset>
-                                <RadzenRow AlignItems="AlignItems.Center" class="my-1">
-                                    <RadzenColumn Size="12" SizeMD="3">
-                                        <RadzenLabel Text="First Name" Style="font-size:small" />
-                                    </RadzenColumn>
-                                    <RadzenColumn Size="12" SizeMD="9">
-                                        <RadzenTextBox Placeholder="First Name" @bind-Value="@Candidate.FirstName" />
-                                    </RadzenColumn>
-                                </RadzenRow>
-                                <RadzenRow AlignItems="AlignItems.Center" class="my-1">
-                                    <RadzenColumn Size="12" SizeMD="3">
-                                        <RadzenLabel Text="Last Name" Style="font-size:small" />
-                                    </RadzenColumn>
-                                    <RadzenColumn Size="12" SizeMD="9">
-                                        <RadzenTextBox Placeholder="Last Name" @bind-Value="@Candidate.LastName" />
-                                    </RadzenColumn>
-                                </RadzenRow>
-                                <RadzenRow AlignItems="AlignItems.Center" class="my-1">
-                                    <RadzenColumn Size="12" SizeMD="3">
-                                        <RadzenLabel Text="Date of Birth" Style="font-size:small" />
-                                    </RadzenColumn>
-                                    <RadzenColumn Size="12" SizeMD="9">
-                                        <RadzenDatePicker Placeholder="Date of Birth" DateFormat="yyyy-MM-dd" @bind-Value="@Candidate.DateOfBirth" Style="width: 70%;" />
-                                    </RadzenColumn>
-                                </RadzenRow>
-                                <RadzenRow AlignItems="AlignItems.Center" class="my-2">
-                                    <RadzenColumn Size="12" SizeMD="3">
-                                        <RadzenLabel Text="Email" Style="font-size:small" />
-                                    </RadzenColumn>
-                                    <RadzenColumn Size="12" SizeMD="9">
-                                        <RadzenTextBox style="width:260px" Placeholder="Email" @bind-Value="@Candidate.Email" />
-                                    </RadzenColumn>
-                                </RadzenRow>
-
-                            </RadzenFieldset>
-                        </RadzenStack>
-
-                    </RadzenStack>
-                    <RadzenStack JustifyContent="JustifyContent.Start" Gap="0" Class="rz-p-2" Wrap="FlexWrap.Wrap">
-                        <RadzenText Text="Description:" TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0" />
-                        <RadzenTextArea @bind-Value="@Candidate.Description"></RadzenTextArea>
-                    </RadzenStack>
-                    <DataAnnotationsValidator />
-                    <ValidationSummary />
-                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" Class="rz-mt-8 rz-mb-4">
-                        <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Save" />
-                    </RadzenStack>
-                </EditForm>
             </div>
         </div>
     </div>
 </div>
 
-                
-  
 
 
 @code {
-    //[Parameter]
-    //public CandidateDetailsDto Candidate { get; set; }
-
-    private string UploadFileWarning = string.Empty;
-    private string Img = string.Empty;
-    private long maxFileSize = 1024 * 1024 * 3; 
-
+    [Parameter]
+    public int? CandidateId { get; set; }
     [Parameter]
     public EventCallback<CandidateEditViewModel> SaveCandidateAsync { get; set; }
 
     [Parameter]
     public EventCallback Close { get; set; }
-
     [Parameter]
     public CandidateEditViewModel Candidate { get; set; }
-    //[Parameter]
-    //public EventCallback EditCandidateMainInfo { get; set; }
 
-    //CandidateEditViewModel Model;
-
-    //public async Task StartEditAsync()
-    //{
-    //    // Model = mapper.Map<CandidateEditViewModel>(Candidate);
-    //}
-
-
-    protected async override Task OnInitializedAsync()
-    {
-
-    }
 
     private async Task OnSaveCandidateAsync()
     {
-        await SaveCandidateAsync.InvokeAsync(Candidate);
+        if (CandidateId != null && CandidateId > 0)
+        {
+            await SaveCandidateAsync.InvokeAsync(Candidate);
+        }
     }
     private async Task OnCloseAsync()
     {
         await Close.InvokeAsync();
     }
 
-    private async Task HandlePhotoChange(InputFileChangeEventArgs e)
-    {
-        var file = e.File;
-        if (e.File != null)
-        {
-            if (file.Size > maxFileSize)
-            {
-                UploadFileWarning = "This file is too big to upload";
-                return;
-            }
-            string extension = System.IO.Path.GetExtension(file.Name);
-            if (extension.ToLower().Contains("jpg") || extension.ToLower().Contains("png") || extension.ToLower().Contains("jpeg"))
-            {
-
-                var buffer = new byte[file.Size];
-                var fileContent = new StreamContent(file.OpenReadStream(1024 * 1024 * 15));
-                buffer = await fileContent.ReadAsByteArrayAsync();
-                string base64String = Convert.ToBase64String(buffer);
-                string imageType = file.ContentType;
-                Candidate.ProfilePictureData = base64String;
-                Candidate.ProfilePicture = file.Name;
-                //Book.ImageData = base64String;
-                //Book.OriginalImageName = file.Name;
-                //Img = $"data:{imageType}; base64, {base64String}";
-                Candidate.ProfilePath = $"data:{imageType}; base64, {base64String}";
-            }
-            else
-            {
-                UploadFileWarning = "Please select a valid image file (*.jpg | *.png | *.jpeg)";
-            }
-        }
-
-    }
 }

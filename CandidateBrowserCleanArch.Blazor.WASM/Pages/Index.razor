@@ -1,13 +1,22 @@
 ﻿@inject DialogService DialogService
+@inject CandidateSearchStateContainer CandidateSearchStateContainer
+@inject NotificationService NotificationService
 @page "/"
 @attribute [Authorize(Policy = PermissionStatics.CandidateRead)]
-
+@if (AddCandidateDialogOpen)
+{
+    <CandidateAddDialog Candidate="candidateToAdd" Close="OnCloseAsync" />
+}
 <div class="container mt-1">
     @if (IsLoadDataChanged)
     {
         <RadzenButton Text="Show filters" Icon="@(IsFiltered?"filter_list":"filter_list_off")" ButtonStyle="ButtonStyle.Primary"
                   Click="OpenOrder"/>
+        <AuthorizeView Policy="@PermissionStatics.CandidateCreate">
+            <RadzenButton Click="AddCandidateAsync" Text="Add new candidate" Icon="add" />
+        </AuthorizeView>
     }
+
     <CandidatesList LoadDataChanged="OnLoadDataChanged"/>
 
 </div>
@@ -16,6 +25,8 @@
 {
     bool IsLoadDataChanged;
     bool IsFiltered;
+    bool AddCandidateDialogOpen;
+    CandidateEditViewModel candidateToAdd;
     public async Task OpenOrder()
     {
         await DialogService.OpenSideAsync<CandidatesSearchPanel>("Candidate search filters", null,
@@ -35,6 +46,35 @@
         IsLoadDataChanged = args.Item1;
         IsFiltered = args.Item2;
         StateHasChanged();
+    }
+
+    public async Task AddCandidateAsync()
+    {
+        candidateToAdd = new();       
+        // candidateEdit = mapper.Map<CandidateEditViewModel>(Candidate);
+        AddCandidateDialogOpen = true;
+    }
+
+    private async Task OnCloseAsync(CandidateEditViewModel candidate)
+    {
+        if (candidate.Id> 0)
+        {
+
+
+            CandidateSearchStateContainer.ClearSearchParameters();
+            CandidateSearchStateContainer.SearchTrigerred?.Invoke();
+
+              NotificationService
+            .Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Duration = 4000,
+                    Summary = "Success",
+                  Detail = $"{candidate.FirstName} {candidate.LastName} created"
+                });
+        }
+
+        AddCandidateDialogOpen = false;
     }
 }
 

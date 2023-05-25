@@ -21,8 +21,8 @@ public class CandidateEditViewModel
     [EmailAddress(ErrorMessage = "Invalid email adress format")]
     public string Email { get; set; }
 
-    [DataType(DataType.Date),Required,CandidateDateOfBirthValidation]
-    public DateTime DateOfBirth { get; set; }
+    [DataType(DataType.Date), Required, CandidateDateOfBirthValidation]
+    public DateTime DateOfBirth { get; set; } = DateTime.Today;
     public string Description { get; set; }
     public string? ProfilePicture { get; set; }
     public string? ProfilePictureOld { get; set; }
