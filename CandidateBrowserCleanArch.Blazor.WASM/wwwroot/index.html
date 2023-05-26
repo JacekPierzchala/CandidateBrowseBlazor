@@ -19,12 +19,18 @@
 
 <body>
     <div id="app">
-        <div style="position:absolute; top:30vh; width:100%; text-align:center">
-            <div style="display:flex; gap:10px; justify-content:center; align-items:center">
-                <div class="spinner-grow" role="status"></div>
-                Candidate Browser is loading...
+        <div class="progress w-50" style="position: relative; margin-top:20%; left: 27%">
+            <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width: var(--blazor-load-percentage, 0%)">
+                <span class="loading-text">Candidate Browser is loading...</span>
             </div>
         </div>
+
+        <!--<div style="position:absolute; top:30vh; width:100%; text-align:center">
+        <div style="display:flex; gap:10px; justify-content:center; align-items:center">
+            <div class="spinner-grow" role="status"></div>
+            Candidate Browser is loading...
+        </div>
+    </div>-->
     </div>
 
     <div id="blazor-error-ui">

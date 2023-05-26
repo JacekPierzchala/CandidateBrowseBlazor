@@ -3,7 +3,7 @@
         <AuthorizeView Policy=@PermissionStatics.CandidateRead>
             <Authorized>
             <RadzenMenuItem class="m-1" Path="@UrlStatics.home" Text="Candidates" Icon="dashboard" />
-            <RadzenMenuItem class="m-1" Path="counter" Text="User details" Icon="face" />
+            <RadzenMenuItem class="m-1" Path="@UrlStatics.users" Text="User details" Icon="face" />
             <RadzenMenuItem class="m-1"  Icon="person">
                 <RadzenMenuItem Path="@UrlStatics.logout" class="m-1" Text="Log Out" Icon="account_circle"/>
             </RadzenMenuItem>
