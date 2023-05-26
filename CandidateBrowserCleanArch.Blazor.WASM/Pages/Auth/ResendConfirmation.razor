@@ -1,75 +1,75 @@
-﻿@page "/users/ForgotPassword"
+﻿@page "/auth/ResendConfirmation"
 @inject NavigationManager NavigationManager
 @inject IAuthenticationService AuthenticationService
 @inject NotificationService NotificationService
 
-@if (ResendProcessError)
+
+@if (ResendProcessError )
 {
     <RadzenAlert Title="@messageTitle" AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
         <RadzenText>@message</RadzenText>
     </RadzenAlert>
 }
-@*
+
 @if (ResendProcessSuccess && !ResendProcessPending)
 {
     <RadzenAlert Title="@messageTitle" AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter">
         <RadzenText>@message</RadzenText>
     </RadzenAlert>
-}*@
+}
+
 @if (!ResendProcessPending)
 {
     <RadzenStack Gap="0" Class="rz-my-12 rz-mx-auto rz-border-radius-6 rz-shadow-10" Style="width: 100%; max-width: 450px; overflow: hidden;">
         <RadzenCard Class="rz-shadow-0 rz-border-radius-0 rz-background-color-info rz-p-12" style="text-align: center;">
             <RadzenText TextStyle="TextStyle.DisplayH3" TagName="TagName.H2" Class="rz-color-white rz-mb-0">Candidates Browser</RadzenText>
         </RadzenCard>
-        <EditForm Model="ForgotPasswordViewModel" OnValidSubmit="HandleForgotPassword">
+        <EditForm Model="ResendConfirmationViewModel" OnValidSubmit="HandleResend">
             <DataAnnotationsValidator />
             <ValidationSummary />
             <RadzenCard>
                 <RadzenStack>
-                    <RadzenTextBox Placeholder="Email" @bind-Value="ForgotPasswordViewModel.Email" />
-                    <RadzenButton class="mt-1" ButtonType="ButtonType.Submit"><RadzenIcon Icon="send" />Send Change Password Link</RadzenButton>
+                <RadzenTextBox Placeholder="Email" @bind-Value="ResendConfirmationViewModel.Email" />
+                <RadzenButton class="mt-1" ButtonType="ButtonType.Submit"><RadzenIcon Icon="send" />Send Confirmation</RadzenButton>
                 </RadzenStack>
             </RadzenCard>
         </EditForm>
-        <RadzenButton class="mt-1" Click="BackToLogin" ButtonType="ButtonType.Submit"><RadzenIcon Icon="arrow_back_ios_new" />Back to Login</RadzenButton>
-
-    </RadzenStack>
+    <RadzenButton class="mt-1" Click="BackToRegister"><RadzenIcon Icon="arrow_back_ios_new" />Back to Register</RadzenButton>
+</RadzenStack>
 }
 else
 {
-    <LoadingElement Message="Sending reset link..." />
+    <LoadingElement Message="Sending confirmation ..." />
 }
 
 @code {
-    ForgotPasswordViewModel ForgotPasswordViewModel = new();
+    ResendConfirmationViewModel ResendConfirmationViewModel = new();
     bool ResendProcessPending;
     bool ResendProcessError;
     bool ResendProcessSuccess;
     string message = string.Empty;
     string messageTitle = string.Empty;
 
-    private async Task HandleForgotPassword()
+    private async Task HandleResend()
     {
         ResendProcessPending = true;
         ResendProcessError = false;
         ResendProcessSuccess = false;
         StateHasChanged();
 
-        var response = await AuthenticationService.ForgotPasswordAsync(ForgotPasswordViewModel);
+        var response = await AuthenticationService.ResendConfirmationAsync(ResendConfirmationViewModel);
         if (response.Success)
         {
-            ResendProcessPending = false;
             NotificationService
-            .Notify(new NotificationMessage { 
-                    Severity = NotificationSeverity.Success,
-                    Duration = 4000, 
-                    Summary = response.Message,
-                    Detail = $"Reset link has been to {ForgotPasswordViewModel.Email}" 
-            });
-            ResendProcessSuccess = true;
-            BackToLogin();
-
+            .Notify(new NotificationMessage
+           {
+               Severity = NotificationSeverity.Success,
+               Duration = 4000,
+               Summary = response.Message,
+               Detail = $"Registration link has been to {ResendConfirmationViewModel.Email}"
+           });
+            ResendProcessPending = false;
+            NavigationManager.NavigateTo(UrlStatics.login);
         }
         else
         {
@@ -82,8 +82,10 @@ else
         StateHasChanged();
     }
 
-    private void BackToLogin()
+    private void BackToRegister()
     {
-        NavigationManager.NavigateTo(UrlStatics.login);
+        NavigationManager.NavigateTo(UrlStatics.register);
     }
+
+
 }
