@@ -22,6 +22,7 @@ namespace CandidateBrowserCleanArch.Blazor.WASM.Configurations
             services.AddScoped<ICompaniesService, CompaniesService>();
             services.AddScoped<ICandidateCompanyService, CandidateCompanyService>();
             services.AddScoped<ICandidateProjectService, CandidateProjectService>();
+            services.AddScoped<IUserService, UserService>();
         }
     }
 }

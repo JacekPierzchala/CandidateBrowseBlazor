@@ -1,7 +1,34 @@
 ﻿@page "/users"
+@inject IUserService UserService
 @attribute [Authorize(Policy = PermissionStatics.UserUpdate)]
-<h3>Users</h3>
+@if (users!=null)
+{
+    <RadzenDataGrid Data="@users" TItem="ReadUserListDto" GridLines="DataGridGridLines.Default" AllowPaging="true" AllowSorting="true">
+        <Columns>
+            <RadzenDataGridColumn TItem="ReadUserListDto" Property="FirstName" Title="First Name" />
+            <RadzenDataGridColumn TItem="ReadUserListDto" Property="LastName" Title="Last Name" />
+  
+        </Columns>
+    </RadzenDataGrid>
+}
+else
+{
+    <LoadingElement  Message="Loading users..."/>
+}
 
 @code {
+    IEnumerable<ReadUserListDto> users;
 
+    protected async override Task OnInitializedAsync()
+    {
+        var response = await UserService.GetUsersAsync();
+        if (response.Success)
+        {
+            users = response.Data;
+        }
+        else
+        {
+            
+        }
+    }
 }
