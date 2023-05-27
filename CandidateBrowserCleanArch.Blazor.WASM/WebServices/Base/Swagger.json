@@ -2068,6 +2068,11 @@
             "type": "string",
             "nullable": true
           },
+          "fullName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
           "userName": {
             "type": "string",
             "nullable": true
@@ -2082,7 +2087,8 @@
           },
           "dateLogged": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "nullable": true
           },
           "roles": {
             "type": "array",
@@ -2125,6 +2131,11 @@
             "type": "string",
             "nullable": true
           },
+          "fullName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
           "userName": {
             "type": "string",
             "nullable": true
@@ -2139,7 +2150,8 @@
           },
           "dateLogged": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "nullable": true
           }
         },
         "additionalProperties": false

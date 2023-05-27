@@ -1,9 +1,14 @@
 ﻿
     <RadzenMenu>
-        <AuthorizeView Policy=@PermissionStatics.CandidateRead>
-            <Authorized>
+        <AuthorizeView Context="Parent" Policy=@PermissionStatics.CandidateRead>
+            <Authorized  >
             <RadzenMenuItem class="m-1" Path="@UrlStatics.home" Text="Candidates" Icon="dashboard" />
-            <RadzenMenuItem class="m-1" Path="@UrlStatics.users" Text="User details" Icon="face" />
+            <AuthorizeView Context="Child" Policy=@PermissionStatics.UserUpdate>
+                 <Authorized >
+                             <RadzenMenuItem class="m-1" Path="@UrlStatics.users" Text="Users" Icon="face" />
+                             </Authorized>
+             </AuthorizeView>
+
             <RadzenMenuItem class="m-1"  Icon="person">
                 <RadzenMenuItem Path="@UrlStatics.logout" class="m-1" Text="Log Out" Icon="account_circle"/>
             </RadzenMenuItem>
