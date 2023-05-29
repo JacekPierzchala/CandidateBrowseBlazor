@@ -4,6 +4,7 @@
 @inject NotificationService NotificationService
 @inject IMapper mapper
 @attribute [Authorize(Policy = PermissionStatics.CandidateRead)]
+@inject IAuthorizationService AuthorizationService
 
 @if(!updatePending)
 {
@@ -11,7 +12,27 @@
     {
             <CandidateMainInfoDialog Close="OnCloseAsync" CandidateId="Candidate.Id" Candidate="candidateEdit" SaveCandidateAsync="OnSaveCandidateAsync" />
     }
+    <AuthorizeView Policy="@PermissionStatics.UserUpdate">
+        <RadzenStack Orientation="Orientation.Horizontal" class="mb-3" Wrap="FlexWrap.Wrap">
+            <RadzenStack Gap="0" Wrap="FlexWrap.Wrap">
+                <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Created Date:</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1"><b>@candidateAdminInfo?.CreatedDate.Value.DateTime.ToString("yyyy-MM-dd hh:mm:ss")</b></RadzenText>
+                <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Created By:</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1">
+                    <b>@(candidateAdminInfo?.CreatedByUser!=null?candidateAdminInfo?.CreatedByUser.FullName:candidateAdminInfo?.CreatedBy) </b>
+                </RadzenText>
+            </RadzenStack>
+            <RadzenStack Gap="0" Wrap="FlexWrap.Wrap">
+                <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Modified Date:</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1"><b>@candidateAdminInfo?.ModifiedDate.Value.DateTime.ToString("yyyy-MM-dd hh:mm:ss")</b></RadzenText>
+                <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Modified By:</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1">
+                    <b>@(candidateAdminInfo?.ModifiedByUser!=null?candidateAdminInfo?.ModifiedByUser.FullName:candidateAdminInfo?.ModifiedBy)</b>
+                    </RadzenText>
+            </RadzenStack>
+        </RadzenStack>
 
+    </AuthorizeView>
     <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" JustifyContent="JustifyContent.Start" Gap="1rem">
         <AuthorizeView Policy="@PermissionStatics.CandidateUpdate">
             <RadzenButton Click="EditCandidateAsync" Icon="edit" Style="height:25px;" />
@@ -42,13 +63,30 @@ else
 
 
 @code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
     [Parameter]
     public CandidateDetailsDto Candidate { get; set; }
     bool mainInfoDialogOpen;
     CandidateEditViewModel candidateEdit;
+    CandidateDetailsForAdminDto candidateAdminInfo;
     bool updatePending;
 
-
+    protected async override Task OnInitializedAsync()
+    {
+        var authenticationState = await authenticationStateTask;
+        if ((bool)authenticationState?.User?.Identity.IsAuthenticated
+        && (await AuthorizationService.AuthorizeAsync(authenticationState?.User,PermissionStatics.UserUpdate)).Succeeded)
+        {
+            var resposne = await CandidatesService.GetCandidateAdminDetailsAsync(Candidate.Id);
+            if(resposne.Success)
+            {
+                candidateAdminInfo = resposne.Data;
+            }
+        }
+        //if(AuthorizeView.)
+    }
 
     public async Task EditCandidateAsync()
     {

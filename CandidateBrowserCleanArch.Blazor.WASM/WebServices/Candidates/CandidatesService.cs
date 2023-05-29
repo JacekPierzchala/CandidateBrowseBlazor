@@ -127,4 +127,27 @@ public class CandidatesService : BaseHttpService, ICandidatesService
         return response;
     }
 
+    public async Task<Response<CandidateDetailsForAdminDto>> GetCandidateAdminDetailsAsync(int candidateId)
+    {
+        var response = new Response<CandidateDetailsForAdminDto>();
+        try
+        {
+            if (await GetBearerTokenAsync())
+            {
+                var resultApi = await _client.AdminAsync(candidateId, ApiVersion);
+                response.Success = resultApi.Success;
+                response.Data = resultApi.Data;
+            }
+            else
+            {
+                await _authenticationService.LogOut();
+            }
+        }
+        catch (ApiException ex)
+        {
+            response = ConvertApiExceptions<CandidateDetailsForAdminDto>(ex);
+        }
+
+        return response;
+    }
 }
