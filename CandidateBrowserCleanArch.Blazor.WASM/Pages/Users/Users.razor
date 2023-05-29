@@ -1,15 +1,22 @@
 ﻿@page "/users"
 @inject IUserService UserService
 @attribute [Authorize(Policy = PermissionStatics.UserUpdate)]
-@if (users!=null)
+@if (users != null && loadDataFinished)
 {
     <RadzenDataGrid Data="@users" TItem="ReadUserListDto" GridLines="DataGridGridLines.Default" AllowPaging="true" AllowSorting="true">
         <Columns>
-            <RadzenDataGridColumn TItem="ReadUserListDto" Property="FirstName" Title="First Name" />
-            <RadzenDataGridColumn TItem="ReadUserListDto" Property="LastName" Title="Last Name" />
+            <RadzenDataGridColumn TItem="ReadUserListDto" Property="FullName" Title="Name" />
+            <RadzenDataGridColumn TItem="ReadUserListDto" Property="UserName" Title="User Name" />
+            <RadzenDataGridColumn TItem="ReadUserListDto" Property="RoleNames" Title="Roles" />
+            <RadzenDataGridColumn TItem="ReadUserListDto" Property="DateRegistered" FormatString="{0:yyyy-MM-dd hh:mm:ss}" Title="Registration Date" />
+            <RadzenDataGridColumn TItem="ReadUserListDto" Property="DateLogged" FormatString="{0:yyyy-MM-dd hh:mm:ss}" Title="Last Login Date" />
   
         </Columns>
     </RadzenDataGrid>
+}
+else if(loadDataFinished)
+{
+    <RadzenAlert  >@errorMessage</RadzenAlert>
 }
 else
 {
@@ -18,7 +25,8 @@ else
 
 @code {
     IEnumerable<ReadUserListDto> users;
-
+    bool loadDataFinished;
+    string errorMessage = string.Empty;
     protected async override Task OnInitializedAsync()
     {
         var response = await UserService.GetUsersAsync();
@@ -28,7 +36,8 @@ else
         }
         else
         {
-            
+            errorMessage = "Load users data failed";
         }
+        loadDataFinished = true;
     }
 }

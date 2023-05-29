@@ -9,6 +9,7 @@ public interface ICandidatesService
     Task<Response<IEnumerable<CandidateListDto>>> GetActiveCandidatesAsync
         (CandidateSearchParameters searchParameters);
     Task<Response<CandidateDetailsDto>> GetCandidateDetailsAsync(int candidateId);
+    Task<Response<CandidateDetailsForAdminDto>> GetCandidateAdminDetailsAsync(int candidateId);
     Task<Response<CandidateDetailsDto>>UpdateCandidateMainInfoAsync(CandidateEditViewModel candidate);
     Task<Response<CandidateDetailsDto>> AddCandidateMainInfoAsync(CandidateEditViewModel candidate);
 }
