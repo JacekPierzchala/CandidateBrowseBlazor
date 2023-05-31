@@ -1,6 +1,6 @@
-﻿@inject DialogService DialogService
+﻿@*@inject DialogService DialogService
 @inject CandidateSearchStateContainer CandidateSearchStateContainer
-@inject NotificationService NotificationService
+@inject NotificationService NotificationService*@
 @page "/"
 @attribute [Authorize(Policy = PermissionStatics.CandidateRead)]
 @if (AddCandidateDialogOpen)
@@ -23,59 +23,59 @@
 
 @code
 {
-    bool IsLoadDataChanged;
-    bool IsFiltered;
-    bool AddCandidateDialogOpen;
-    CandidateEditViewModel candidateToAdd;
-    public async Task OpenOrder()
-    {
-        await DialogService.OpenSideAsync<CandidatesSearchPanel>("Candidate search filters", null,
-         new SideDialogOptions
-             {
-                 CloseDialogOnOverlayClick = false,
-                 Position = DialogPosition.Left,
-                 ShowMask = true,
-                 ShowTitle = true,
-                 Height = "600px;",
-                 Width = "400px;"
-             });
-    }
+    //bool IsLoadDataChanged;
+    //bool IsFiltered;
+    //bool AddCandidateDialogOpen;
+    //CandidateEditViewModel candidateToAdd;
 
-    private async Task OnLoadDataChanged(Tuple<bool, bool> args)
-    {
-        IsLoadDataChanged = args.Item1;
-        IsFiltered = args.Item2;
-        StateHasChanged();
-    }
+    //public async Task OpenOrder()
+    //{
+    //    await DialogService.OpenSideAsync<CandidatesSearchPanel>("Candidate search filters", null,
+    //     new SideDialogOptions
+    //         {
+    //             CloseDialogOnOverlayClick = false,
+    //             Position = DialogPosition.Left,
+    //             ShowMask = true,
+    //             ShowTitle = true,
+    //             Height = "600px;",
+    //             Width = "400px;"
+    //         });
+    //}
 
-    public async Task AddCandidateAsync()
-    {
-        candidateToAdd = new();       
-        // candidateEdit = mapper.Map<CandidateEditViewModel>(Candidate);
-        AddCandidateDialogOpen = true;
-    }
+    //private async Task OnLoadDataChanged(Tuple<bool, bool> args)
+    //{
+    //    IsLoadDataChanged = args.Item1;
+    //    IsFiltered = args.Item2;
+    //    StateHasChanged();
+    //}
 
-    private async Task OnCloseAsync(CandidateEditViewModel candidate)
-    {
-        if (candidate.Id> 0)
-        {
+    //public async Task AddCandidateAsync()
+    //{
+    //    candidateToAdd = new();       
+    //    AddCandidateDialogOpen = true;
+    //}
+
+    //private async Task OnCloseAsync(CandidateEditViewModel candidate)
+    //{
+    //    if (candidate.Id> 0)
+    //    {
 
 
-            CandidateSearchStateContainer.ClearSearchParameters();
-            CandidateSearchStateContainer.SearchTrigerred?.Invoke();
+    //        CandidateSearchStateContainer.ClearSearchParameters();
+    //        CandidateSearchStateContainer.SearchTrigerred?.Invoke();
 
-              NotificationService
-            .Notify(new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Success,
-                    Duration = 4000,
-                    Summary = "Success",
-                  Detail = $"{candidate.FirstName} {candidate.LastName} created"
-                });
-        }
+    //          NotificationService
+    //        .Notify(new NotificationMessage
+    //            {
+    //                Severity = NotificationSeverity.Success,
+    //                Duration = 4000,
+    //                Summary = "Success",
+    //              Detail = $"{candidate.FirstName} {candidate.LastName} created"
+    //            });
+    //    }
 
-        AddCandidateDialogOpen = false;
-    }
+    //    AddCandidateDialogOpen = false;
+    //}
 }
 
 

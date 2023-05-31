@@ -1,8 +1,8 @@
-﻿@inject CandidateSearchStateContainer CandidateSearchStateContainer
+﻿@*@inject CandidateSearchStateContainer CandidateSearchStateContainer
 @inject ICompaniesService CompaniesService
 @inject IProjectsService ProjectsService
 @inject HttpInterceptorService HttpInterceptorService
-@implements IDisposable
+@implements IDisposable*@
 
 @if (Companies != null && Projects != null)
 {
@@ -39,45 +39,43 @@ else
     <LoadingElement Message="Loading data..." />
 }
 
-
-
 @code {
-    IEnumerable<ReadCompanyDto> Companies;
-    IEnumerable<ReadProjectDto> Projects;
+    //IEnumerable<ReadCompanyDto> Companies;
+    //IEnumerable<ReadProjectDto> Projects;
 
 
-    private void RaiseSearchStarted()
-    {
-        CandidateSearchStateContainer.CandidateSearchParameters.PageNumber = 1;
-        CandidateSearchStateContainer.SearchTrigerred?.Invoke();
-    }
+    //private void RaiseSearchStarted()
+    //{
+    //    CandidateSearchStateContainer.CandidateSearchParameters.PageNumber = 1;
+    //    CandidateSearchStateContainer.SearchTrigerred?.Invoke();
+    //}
 
-    protected async override Task OnInitializedAsync()
-    {
-        HttpInterceptorService.RegisterEvent();
-        var resultCompany = await CompaniesService.GetAllActiveCompaniesAsync(false);
-        if (resultCompany.Success)
-        {
-            Companies = resultCompany?.Data;
-        }
+    //protected async override Task OnInitializedAsync()
+    //{
+    //    HttpInterceptorService.RegisterEvent();
+    //    var resultCompany = await CompaniesService.GetAllActiveCompaniesAsync(false);
+    //    if (resultCompany.Success)
+    //    {
+    //        Companies = resultCompany?.Data;
+    //    }
 
-        var resultProject = await ProjectsService.GetAllActiveProjectsAsync(false);
-        if (resultProject.Success)
-        {
-            Projects = resultProject?.Data;
-        }
+    //    var resultProject = await ProjectsService.GetAllActiveProjectsAsync(false);
+    //    if (resultProject.Success)
+    //    {
+    //        Projects = resultProject?.Data;
+    //    }
 
-        StateHasChanged();
-    }
+    //    StateHasChanged();
+    //}
 
-    private void ResetFilters()
-    {
-        CandidateSearchStateContainer.ClearSearchParameters();
-        StateHasChanged();
-    }
+    //private void ResetFilters()
+    //{
+    //    CandidateSearchStateContainer.ClearSearchParameters();
+    //    StateHasChanged();
+    //}
 
-    public void Dispose()
-    {
-        HttpInterceptorService.DisposeEvent();
-    }
+    //public void Dispose()
+    //{
+    //    HttpInterceptorService.DisposeEvent();
+    //}
 }

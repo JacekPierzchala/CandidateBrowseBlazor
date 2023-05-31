@@ -1,8 +1,7 @@
 ﻿@page "/auth/ResendConfirmation"
-@inject NavigationManager NavigationManager
+@*@inject NavigationManager NavigationManager
 @inject IAuthenticationService AuthenticationService
-@inject NotificationService NotificationService
-
+@inject NotificationService NotificationService*@
 
 @if (ResendProcessError )
 {
@@ -43,49 +42,48 @@ else
 }
 
 @code {
-    ResendConfirmationViewModel ResendConfirmationViewModel = new();
-    bool ResendProcessPending;
-    bool ResendProcessError;
-    bool ResendProcessSuccess;
-    string message = string.Empty;
-    string messageTitle = string.Empty;
+    //ResendConfirmationViewModel ResendConfirmationViewModel = new();
+    //bool ResendProcessPending;
+    //bool ResendProcessError;
+    //bool ResendProcessSuccess;
+    //string message = string.Empty;
+    //string messageTitle = string.Empty;
 
-    private async Task HandleResend()
-    {
-        ResendProcessPending = true;
-        ResendProcessError = false;
-        ResendProcessSuccess = false;
-        StateHasChanged();
+    //private async Task HandleResend()
+    //{
+    //    ResendProcessPending = true;
+    //    ResendProcessError = false;
+    //    ResendProcessSuccess = false;
+    //    StateHasChanged();
 
-        var response = await AuthenticationService.ResendConfirmationAsync(ResendConfirmationViewModel);
-        if (response.Success)
-        {
-            NotificationService
-            .Notify(new NotificationMessage
-           {
-               Severity = NotificationSeverity.Success,
-               Duration = 4000,
-               Summary = response.Message,
-               Detail = $"Registration link has been to {ResendConfirmationViewModel.Email}"
-           });
-            ResendProcessPending = false;
-            NavigationManager.NavigateTo(UrlStatics.login);
-        }
-        else
-        {
-            message = response.ValidationErrors;
-            messageTitle = response.Message;
-            ResendProcessError = true;
-        }
-        ResendProcessPending = false;
+    //    var response = await AuthenticationService.ResendConfirmationAsync(ResendConfirmationViewModel);
+    //    if (response.Success)
+    //    {
+    //        NotificationService
+    //        .Notify(new NotificationMessage
+    //       {
+    //           Severity = NotificationSeverity.Success,
+    //           Duration = 4000,
+    //           Summary = response.Message,
+    //           Detail = $"Registration link has been to {ResendConfirmationViewModel.Email}"
+    //       });
+    //        ResendProcessPending = false;
+    //        NavigationManager.NavigateTo(UrlStatics.login);
+    //    }
+    //    else
+    //    {
+    //        message = response.ValidationErrors;
+    //        messageTitle = response.Message;
+    //        ResendProcessError = true;
+    //    }
+    //    ResendProcessPending = false;
 
-        StateHasChanged();
-    }
+    //    StateHasChanged();
+    //}
 
-    private void BackToRegister()
-    {
-        NavigationManager.NavigateTo(UrlStatics.register);
-    }
-
+    //private void BackToRegister()
+    //{
+    //    NavigationManager.NavigateTo(UrlStatics.register);
+    //}
 
 }
