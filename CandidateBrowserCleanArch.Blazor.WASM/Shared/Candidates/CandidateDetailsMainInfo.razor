@@ -1,10 +1,10 @@
-﻿@inject AuthenticationStateProvider AuthenticationStateProvider;
+﻿@*@inject AuthenticationStateProvider AuthenticationStateProvider;
 @inject DialogService DialogService
 @inject ICandidatesService CandidatesService
 @inject NotificationService NotificationService
 @inject IMapper mapper
+@inject IAuthorizationService AuthorizationService*@
 @attribute [Authorize(Policy = PermissionStatics.CandidateRead)]
-@inject IAuthorizationService AuthorizationService
 
 @if(!updatePending)
 {
@@ -63,80 +63,74 @@ else
 
 
 @code {
-    [CascadingParameter]
-    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    //[CascadingParameter]
+    //private Task<AuthenticationState> authenticationStateTask { get; set; }
 
-    [Parameter]
-    public CandidateDetailsDto Candidate { get; set; }
-    bool mainInfoDialogOpen;
-    CandidateEditViewModel candidateEdit;
-    CandidateDetailsForAdminDto candidateAdminInfo;
-    bool updatePending;
+    //[Parameter]
+    //public CandidateDetailsDto Candidate { get; set; }
+    //bool mainInfoDialogOpen;
+    //CandidateEditViewModel candidateEdit;
+    //CandidateDetailsForAdminDto candidateAdminInfo;
+    //bool updatePending;
 
-    protected async override Task OnInitializedAsync()
-    {
-        var authenticationState = await authenticationStateTask;
-        if ((bool)authenticationState?.User?.Identity.IsAuthenticated
-        && (await AuthorizationService.AuthorizeAsync(authenticationState?.User,PermissionStatics.UserUpdate)).Succeeded)
-        {
-            var resposne = await CandidatesService.GetCandidateAdminDetailsAsync(Candidate.Id);
-            if(resposne.Success)
-            {
-                candidateAdminInfo = resposne.Data;
-            }
-        }
-        //if(AuthorizeView.)
-    }
+    //protected async override Task OnInitializedAsync()
+    //{
+    //    var authenticationState = await authenticationStateTask;
+    //    if ((bool)authenticationState?.User?.Identity.IsAuthenticated
+    //    && (await AuthorizationService.AuthorizeAsync(authenticationState?.User,PermissionStatics.UserUpdate)).Succeeded)
+    //    {
+    //        var resposne = await CandidatesService.GetCandidateAdminDetailsAsync(Candidate.Id);
+    //        if(resposne.Success)
+    //        {
+    //            candidateAdminInfo = resposne.Data;
+    //        }
+    //    }
+    //}
 
-    public async Task EditCandidateAsync()
-    {
+    //public async Task EditCandidateAsync()
+    //{
+    //    candidateEdit = mapper.Map<CandidateEditViewModel>(Candidate);
+    //    mainInfoDialogOpen = true;
+    //}
 
-        candidateEdit = mapper.Map<CandidateEditViewModel>(Candidate);
-        mainInfoDialogOpen = true;
-    }
+    //private async Task OnCloseAsync()
+    //{
+    //    mainInfoDialogOpen = false;
+    //}
 
-    private async Task OnCloseAsync()
-    {
-        mainInfoDialogOpen = false;
-    }
+    //private async Task OnSaveCandidateAsync(CandidateEditViewModel candidate)
+    //{
+    //    if (candidate.Id != null && candidate.Id > 0)
+    //    {
+    //        updatePending = true;
+    //        var response = await CandidatesService.UpdateCandidateMainInfoAsync(candidate);
+    //        if (response.Success)
+    //        {
+    //            Candidate = response.Data;
+    //            NotificationService
+    //           .Notify(new NotificationMessage
+    //               {
+    //                   Severity = NotificationSeverity.Success,
+    //                   Duration = 4000,
+    //                   Summary = "Success",
+    //                   Detail = $"{Candidate.FirstName} {Candidate.LastName} details updated"
+    //               });
+    //        }
+    //        else
+    //        {
+    //            NotificationService
+    //           .Notify(new NotificationMessage
+    //               {
+    //                   Severity = NotificationSeverity.Error,
+    //                   Duration = 4000,
+    //                   Summary = "Error",
+    //                   Detail = $"Update has failed:{response.Message}"
+    //               });
+    //        }
+    //        updatePending = false;
+    //        mainInfoDialogOpen = false;
+    //    }
 
-    private async Task OnSaveCandidateAsync(CandidateEditViewModel candidate)
-    {
-        if (candidate.Id != null && candidate.Id > 0)
-        {
-            updatePending = true;
-            var response = await CandidatesService.UpdateCandidateMainInfoAsync(candidate);
-            if (response.Success)
-            {
-                Candidate = response.Data;
-                NotificationService
-               .Notify(new NotificationMessage
-                   {
-                       Severity = NotificationSeverity.Success,
-                       Duration = 4000,
-                       Summary = "Success",
-                       Detail = $"{Candidate.FirstName} {Candidate.LastName} details updated"
-                   });
-            }
-            else
-            {
-                NotificationService
-               .Notify(new NotificationMessage
-                   {
-                       Severity = NotificationSeverity.Error,
-                       Duration = 4000,
-                       Summary = "Error",
-                       Detail = $"Update has failed:{response.Message}"
-                   });
-            }
-            updatePending = false;
-            mainInfoDialogOpen = false;
-        }
-
-    }
-
-
-
-
+    //}
 
 }

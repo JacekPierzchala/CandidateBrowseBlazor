@@ -1,8 +1,8 @@
 ﻿@page "/auth/login"
-@inject IJSRuntime JSRuntime
+@*@inject IJSRuntime JSRuntime
 @inject IAuthenticationService AuthenticationService
 @inject NavigationManager NavigationManager
-@inject NotificationService NotificationService
+@inject NotificationService NotificationService*@
 
 @if (LoggingProcessError)
 {
@@ -46,51 +46,51 @@ else
 }
 
 @code {
-    LoginViewModel LoginViewModel = new();
-    string message = string.Empty;
-    string messageTitle = string.Empty;
-    bool LoggingProcessPending;
-    bool LoggingProcessError;
+    //LoginViewModel LoginViewModel = new();
+    //string message = string.Empty;
+    //string messageTitle = string.Empty;
+    //bool LoggingProcessPending;
+    //bool LoggingProcessError;
 
-    private async Task HandleLogin()
-    {
-        LoggingProcessPending = true;
-        LoggingProcessError = false;
-        StateHasChanged();
+    //private async Task HandleLogin()
+    //{
+    //    LoggingProcessPending = true;
+    //    LoggingProcessError = false;
+    //    StateHasChanged();
 
-        var response = await AuthenticationService.AuthenticateAsync(LoginViewModel);
-        if (response.Success)
-        {
-            NavigationManager.NavigateTo(UrlStatics.home);
-        }
-        else
-        {
-            message = response.ValidationErrors;
-            messageTitle = response.Message;
-            LoggingProcessError = true;
-        }
-        LoggingProcessPending = false;
+    //    var response = await AuthenticationService.AuthenticateAsync(LoginViewModel);
+    //    if (response.Success)
+    //    {
+    //        NavigationManager.NavigateTo(UrlStatics.home);
+    //    }
+    //    else
+    //    {
+    //        message = response.ValidationErrors;
+    //        messageTitle = response.Message;
+    //        LoggingProcessError = true;
+    //    }
+    //    LoggingProcessPending = false;
 
-        StateHasChanged();
-    }
+    //    StateHasChanged();
+    //}
 
-    private void RouteToRegister()
-    {
-        NavigationManager.NavigateTo(UrlStatics.register);
-    }
+    //private void RouteToRegister()
+    //{
+    //    NavigationManager.NavigateTo(UrlStatics.register);
+    //}
 
-    private async Task HandleGoogleLogin()
-    {
-        var response = await AuthenticationService.GetGoogleAuthUrlAsync();
-        if (!response.Success)
-        {
-            NotificationService.Notify(new NotificationMessage() { Detail=response.Message });
-        }
-        NavigationManager.NavigateTo(response.Data, false);
-    }
+    //private async Task HandleGoogleLogin()
+    //{
+    //    var response = await AuthenticationService.GetGoogleAuthUrlAsync();
+    //    if (!response.Success)
+    //    {
+    //        NotificationService.Notify(new NotificationMessage() { Detail=response.Message });
+    //    }
+    //    NavigationManager.NavigateTo(response.Data, false);
+    //}
 
-    private void RouteToForgotPassword()
-    {
-        NavigationManager.NavigateTo(UrlStatics.forgotPassword);
-    }
+    //private void RouteToForgotPassword()
+    //{
+    //    NavigationManager.NavigateTo(UrlStatics.forgotPassword);
+    //}
 }

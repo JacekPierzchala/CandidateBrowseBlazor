@@ -51,24 +51,11 @@
         {
             Candidate = mapper.Map<CandidateEditViewModel>(response.Data);
             _radzenSteps.SelectedIndex = 1;
-            //StateHasChanged();
-
         }
         else
         {
             //handle
         }
-        //else
-        //{
-        //    NotificationService
-        //   .Notify(new NotificationMessage
-        //       {
-        //           Severity = NotificationSeverity.Error,
-        //           Duration = 4000,
-        //           Summary = "Error",
-        //           Detail = $"Update has failed:{response.Message}"
-        //       });
-        //}
     }
 
 

@@ -1,15 +1,15 @@
 ﻿@page "/candidate/{id:int}"
-@inject IAuthenticationService AuthenticationService
-@inject ICandidatesService CandidatesService
-@inject HttpInterceptorService HttpInterceptorService
-@inject AuthenticationStateProvider AuthenticationStateProvider
-@implements IDisposable
+@*@inject IAuthenticationService AuthenticationService *@
+@*@inject ICandidatesService CandidatesService*@
+@*@inject HttpInterceptorService HttpInterceptorService*@
+@*@inject AuthenticationStateProvider AuthenticationStateProvider*@
+@*@implements IDisposable*@
 @attribute [Authorize(Policy = PermissionStatics.CandidateRead)]
 
 @if (Candidate != null && loadFinished)
 {
+   
     <RadzenCard class="my-4" style="min-width:330px">
-
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
             <RadzenCard class="rz-shadow-5 rz-my-3 rz-mx-auto">
                <CandidateDetailsMainInfo Candidate="@Candidate"/>
@@ -22,7 +22,6 @@
             </RadzenCard>
         </RadzenStack>
     </RadzenCard>
-
 }
 else if (loadFinished)
 {
@@ -35,27 +34,27 @@ else
 
 
 @code {
-    [Parameter]
-    public int Id { get; set; }
-    CandidateDetailsDto Candidate;
-    bool loadDataResult;
-    bool loadFinished;
-    string message = string.Empty;
-    protected async override Task OnInitializedAsync()
-    {
-        loadFinished = false;
-        HttpInterceptorService.RegisterEvent();
+    //[Parameter]
+    //public int Id { get; set; }
+    //CandidateDetailsDto Candidate;
+    //bool loadDataResult;
+    //bool loadFinished;
+    //string message = string.Empty;
+    //protected async override Task OnInitializedAsync()
+    //{
+    //    loadFinished = false;
+    //    HttpInterceptorService.RegisterEvent();
 
-        var request = await CandidatesService.GetCandidateDetailsAsync(Id);
-        loadDataResult = request.Success;
-        Candidate = request.Data;
-        message = request.Message;
-        loadFinished = true;
-    }
+    //    var request = await CandidatesService.GetCandidateDetailsAsync(Id);
+    //    loadDataResult = request.Success;
+    //    Candidate = request.Data;
+    //    message = request.Message;
+    //    loadFinished = true;
+    //}
 
 
-    public void Dispose()
-    {
-        HttpInterceptorService.DisposeEvent();
-    }
+    //public void Dispose()
+    //{
+    //    HttpInterceptorService.DisposeEvent();
+    //}
 }
