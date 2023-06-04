@@ -1,9 +1,4 @@
 ﻿@page "/candidate/{id:int}"
-@*@inject IAuthenticationService AuthenticationService *@
-@*@inject ICandidatesService CandidatesService*@
-@*@inject HttpInterceptorService HttpInterceptorService*@
-@*@inject AuthenticationStateProvider AuthenticationStateProvider*@
-@*@implements IDisposable*@
 @attribute [Authorize(Policy = PermissionStatics.CandidateRead)]
 
 @if (Candidate != null && loadFinished)
@@ -33,28 +28,3 @@ else
 }
 
 
-@code {
-    //[Parameter]
-    //public int Id { get; set; }
-    //CandidateDetailsDto Candidate;
-    //bool loadDataResult;
-    //bool loadFinished;
-    //string message = string.Empty;
-    //protected async override Task OnInitializedAsync()
-    //{
-    //    loadFinished = false;
-    //    HttpInterceptorService.RegisterEvent();
-
-    //    var request = await CandidatesService.GetCandidateDetailsAsync(Id);
-    //    loadDataResult = request.Success;
-    //    Candidate = request.Data;
-    //    message = request.Message;
-    //    loadFinished = true;
-    //}
-
-
-    //public void Dispose()
-    //{
-    //    HttpInterceptorService.DisposeEvent();
-    //}
-}

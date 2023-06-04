@@ -13,6 +13,12 @@ namespace CandidateBrowserCleanArch.Blazor.WASM.Mappers
             CreateMap<ConfirmEmailRepeatRequest, ResendConfirmationViewModel>().ReverseMap();
             CreateMap<ForgotPasswordRequest, ForgotPasswordViewModel>().ReverseMap();
             CreateMap<ResetPasswordRequest, ResetPasswordViewModel>().ReverseMap();
+            CreateMap<ReadUserDetailsDto, EditUserViewModel>()
+                .ForMember(c=>c.UserRoles,map=>map.MapFrom(c=>c.Roles.Select(c=>c.Id)))
+                .ReverseMap();
+            CreateMap<EditUserViewModel, UpdateUserDto>()
+            //.ForMember(c => c.Roles, map => map.MapFrom(c => c.UserRoles.Select(c => new { Id=c,Name=""  })))
+            .ReverseMap();
         }
     }
 }
