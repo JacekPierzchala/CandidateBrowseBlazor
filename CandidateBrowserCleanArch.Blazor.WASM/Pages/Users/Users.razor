@@ -1,16 +1,26 @@
 ﻿@page "/users"
 @inject IUserService UserService
+@inject NotificationService NotificationService
 @attribute [Authorize(Policy = PermissionStatics.UserUpdate)]
+@if (candidateDetailsopen)
+{
+    <UserDetails UserId="@userId" Update="OnUserUpdate" Close="OnUserDetailsClose" />
+}
 @if (users != null && loadDataFinished)
 {
-    <RadzenDataGrid Data="@users" TItem="ReadUserListDto" GridLines="DataGridGridLines.Default" AllowPaging="true" AllowSorting="true">
-        <Columns>
-            <RadzenDataGridColumn TItem="ReadUserListDto" Property="FullName" Title="Name" />
-            <RadzenDataGridColumn TItem="ReadUserListDto" Property="UserName" Title="User Name" />
-            <RadzenDataGridColumn TItem="ReadUserListDto" Property="RoleNames" Title="Roles" />
-            <RadzenDataGridColumn TItem="ReadUserListDto" Property="DateRegistered" FormatString="{0:yyyy-MM-dd hh:mm:ss}" Title="Registration Date" />
-            <RadzenDataGridColumn TItem="ReadUserListDto" Property="DateLogged" FormatString="{0:yyyy-MM-dd hh:mm:ss}" Title="Last Login Date" />
-  
+    <RadzenDataGrid  SelectionMode="DataGridSelectionMode.Single"   Data="@users" TItem="ReadUserListDto" GridLines="DataGridGridLines.Default" AllowPaging="true" AllowSorting="true">
+        <Columns  >
+            <RadzenDataGridColumn Width="100px" TItem="ReadUserListDto" Property="FullName" Title="Name" />
+            <RadzenDataGridColumn Width="150px" TItem="ReadUserListDto" Property="UserName" Title="User Name" />
+            <RadzenDataGridColumn Width="100px" TItem="ReadUserListDto" Property="RoleNames" Title="Roles" />
+            <RadzenDataGridColumn Width="120px" TItem="ReadUserListDto" Property="DateRegistered" FormatString="{0:yyyy-MM-dd hh:mm:ss}" Title="Registration Date" />
+            <RadzenDataGridColumn Width="120px" TItem="ReadUserListDto" Property="DateLogged" FormatString="{0:yyyy-MM-dd hh:mm:ss}" Title="Last Login Date" />
+            <RadzenDataGridColumn Width="100px" TItem="ReadUserListDto">
+                <Template Context="data">
+                    <RadzenButton Click="@(()=>ViewUserDetails(data))" Icon="edit" />
+                </Template>
+               </RadzenDataGridColumn>
+
         </Columns>
     </RadzenDataGrid>
 }
@@ -26,8 +36,17 @@ else
 @code {
     IEnumerable<ReadUserListDto> users;
     bool loadDataFinished;
+    bool candidateDetailsopen;
     string errorMessage = string.Empty;
+
+
+    string userId;
     protected async override Task OnInitializedAsync()
+    {
+        await LoadUsersAsync();
+    }
+
+    private async Task LoadUsersAsync()
     {
         var response = await UserService.GetUsersAsync();
         if (response.Success)
@@ -39,5 +58,45 @@ else
             errorMessage = "Load users data failed";
         }
         loadDataFinished = true;
+    }
+
+    private async Task ViewUserDetails( ReadUserListDto readUser)
+    {
+
+        userId = readUser.Id;
+        candidateDetailsopen = true;
+    }
+
+    private void OnUserDetailsClose()
+    {
+        candidateDetailsopen = false;
+    }
+    private async Task OnUserUpdate(bool result)
+    {
+        candidateDetailsopen = false;
+        if (result)
+        {
+            NotificationService
+               .Notify(new NotificationMessage
+                   {
+                       Severity = NotificationSeverity.Success,
+                       Duration = 4000,
+                       Summary = "Success",
+                       Detail = $"Update has succeeded"
+                   });
+        }
+        else
+        {
+            NotificationService
+               .Notify(new NotificationMessage
+                   {
+                       Severity = NotificationSeverity.Error,
+                       Duration = 4000,
+                       Summary = "Error",
+                       Detail = $"Update has failed"
+                   });
+        }
+        await LoadUsersAsync();
+     
     }
 }

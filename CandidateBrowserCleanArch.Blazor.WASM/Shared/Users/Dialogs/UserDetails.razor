@@ -1,0 +1,115 @@
+﻿@inject IUserService UserService
+@inject IMapper mapper
+@inject IRoleService RoleService
+<div class="modal fade show" id="myModal" style="display:block; background-color: rgba(10,10,10,.8); " aria-modal="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content" style="width:550px; min-height:380px">
+            <div class="modal-header">
+                <RadzenText Text="Edit User details" />
+                <RadzenButton Click="OnCloseAsync" Icon="close" />
+            </div>
+            <div class="modal-body" style="flex-wrap:wrap">
+                @if (dataError)
+                {
+                    <RadzenAlert AlertStyle="AlertStyle.Warning"
+                             Text="@errorMessage" Variant="Variant.Flat" Shade="Shade.Lighter" />
+                }
+                @if (loadDataFinished)
+                {
+                    <EditForm  Model="model" OnValidSubmit="SaveUserAsync">        
+                        <RadzenCard  >
+                            <RadzenStack Wrap="FlexWrap.Wrap" Orientation="Orientation.Horizontal">
+                                <RadzenLabel class="ms-1" Style="width:180px" Text="First Name" />
+                                <RadzenLabel class="ms-5" Style="width:150px" Text="Last Name" />
+                            </RadzenStack>
+                            <RadzenStack Wrap="FlexWrap.Wrap"  Orientation="Orientation.Horizontal">
+                                <RadzenTextBox @bind-Value="@model.FirstName" />
+                                <RadzenTextBox @bind-Value="@model.LastName" />
+                            </RadzenStack>
+                            <RadzenStack>
+                                <RadzenLabel class="ms-1" Style="width:180px" Text="Roles" />
+                                <RadzenDropDown class="mt-1" @bind-Value=model.UserRoles  
+                                            Data=@roles TextProperty="Name" ValueProperty="Id"
+                                        Multiple=true Placeholder="Select Roles" Chips=true Style="width: 100%; max-width: 400px;" />
+                            </RadzenStack>
+                        </RadzenCard>
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+                        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" Class="rz-mt-8 rz-mb-4">
+                            <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Save" />
+                        </RadzenStack>
+                    </EditForm>
+                }
+                else
+                {
+                    <LoadingElement Message="Loading user..." />
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    [Parameter]
+    public string UserId { get; set; }
+    [Parameter]
+    public EventCallback Close { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> Update { get; set; }
+
+    EditUserViewModel model;
+    private async Task OnCloseAsync()
+    {
+        await Close.InvokeAsync();
+    }
+
+    bool dataError;
+    bool loadDataFinished;
+    string errorMessage = string.Empty;
+
+    ReadUserDetailsDto user;
+    List<RoleDto> roles;
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        model = new();
+        var result = await UserService.GetUsersDetailsAsync(UserId);
+        if (result.Success)
+        {
+            user = result.Data;
+            model = mapper.Map<EditUserViewModel>(user);
+        }
+        else
+        {
+            dataError = true;
+            errorMessage = result.Message;
+        }
+
+        var rolesResult = await RoleService.GetRolesAsync();
+        if (rolesResult.Success)
+        {
+            roles = rolesResult.Data.ToList();
+        }
+        else
+        {
+            dataError = true;
+            errorMessage = rolesResult.Message;
+        }
+
+        loadDataFinished = true;
+    }
+
+    private async Task SaveUserAsync()
+    {
+        model.Roles = roles.Where(c => model.UserRoles.Any(r => r == c.Id)).ToList();
+        var result=await UserService.UpdateUserAsync(model);
+        await Update.InvokeAsync(result.Success);
+    }
+
+
+}
