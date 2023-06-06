@@ -16,6 +16,7 @@
 
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    height:9000px;
 }
 
 h1:focus {
@@ -25,20 +26,28 @@ h1:focus {
 .page {
     background-color: var(--background);
     color: var(--font-color);
+    height: 100%;
+}
+
+.textthemes {
+    background-color: var(--background);
+    color: var(--font-color);
 }
 
 .table{
-    color:var(--font-color);
+/*   // color:var(--font-color);*/
 }
-div.main{
-    background-color: var(--background);
+div.main {
+/*    background-color: var(--background);
     color: var(--font-color);
+    height: 100%;*/
 }
 
-/*div {
-    background-color: var(--background);
-    color: var(--font-color);
-}*/
+div {
+    /*background-color: var(--background);*/
+   /* color: var(--font-color);*/
+  
+}
 
 a, .btn-link {
     color: #0071c1;
