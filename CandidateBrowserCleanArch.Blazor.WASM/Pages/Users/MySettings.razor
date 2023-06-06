@@ -1,10 +1,10 @@
 ﻿@inject IUserSettingsProvider UserSettingsProvider
 @attribute [Authorize(Policy = PermissionStatics.CandidateRead)]
-                <RadzenStack>
-                    <RadzenLabel>Color theme</RadzenLabel>
-    <RadzenDropDown Data="themes" @bind-Value=selectedTheme TextProperty="Theme" ValueProperty="Id" Placeholder="Select Theme" />
-                <RadzenButton Text="Save" Click="Save" />
-                </RadzenStack>
+<RadzenStack  style="height:500px; width:350px;" AlignItems="AlignItems.Start">
+    <RadzenText >Color theme</RadzenText>
+    <RadzenDropDown class="mx-1" Data="themes" @bind-Value=selectedTheme TextProperty="Theme" ValueProperty="Id" Placeholder="Select Theme" />
+    <RadzenButton class="mx-1 my-2" Text="Save" Click="Save" />
+ </RadzenStack>
 
 
 

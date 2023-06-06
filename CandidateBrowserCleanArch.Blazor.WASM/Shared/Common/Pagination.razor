@@ -1,14 +1,14 @@
 ﻿@inject CandidateSearchStateContainer CandidateSearchStateContainer
 
-<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
-    <RadzenText TextStyle="TextStyle.Overline">Items per page:</RadzenText>
-    <RadzenDropDown @bind-Value=@Size Data=@sizes Style="max-width: 80px; min-width:75px" Change="@(async()=>await OnSelectedSize())" />
-    <RadzenText Style="min-width:120px" TextStyle="TextStyle.Overline">@pagingSummaryFormat</RadzenText>
-    <RadzenStack Orientation="Orientation.Horizontal" class="rz-border-primary-lighter rz-border-radius-2" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+<RadzenStack class="textthemes"  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+    <p class="textthemes ms-1 mt-1">Items per page:</p>
+    <RadzenDropDown  @bind-Value=@Size Data=@sizes Style="max-width: 80px; min-width:75px" Change="@(async()=>await OnSelectedSize())" />
+    <p style="min-width:120px" class="textthemes ms-1  mt-1">@pagingSummaryFormat</p>
+    <RadzenStack  Orientation="Orientation.Horizontal" class="rz-border-primary-lighter rz-border-radius-2 textthemes" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
         
         @foreach (var link in _links)
         {
-            <RadzenButton Click="() => OnSelectedPage(link)" 
+            <RadzenButton Click="() => OnSelectedPage(link)" class="textthemes"
                 Variant="@(link.Text==CandidateSearchStateContainer.CandidateSearchParameters.PageNumber.ToString()? Variant.Filled:Variant.Text)" 
                 Style="width:40px; max-width:40px" Disabled="!link.Enabled" Text="@link.Text" ButtonStyle="ButtonStyle.Primary"/>
         }
