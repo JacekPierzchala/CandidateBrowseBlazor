@@ -1,6 +1,19 @@
 ﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 @import url('bootstrapicons/bootstrap-icons.css');
 
+:root {
+    /*light theme*/
+    --background: white;
+    --font-color: black;
+    --highlight: #f7f7f7;
+}
+
+.dark-mode {
+    --background: #2d2d2d;
+    --font-color: white;
+    --highlight: #393939;
+}
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
@@ -8,6 +21,24 @@ html, body {
 h1:focus {
     outline: none;
 }
+
+.page {
+    background-color: var(--background);
+    color: var(--font-color);
+}
+
+.table{
+    color:var(--font-color);
+}
+div.main{
+    background-color: var(--background);
+    color: var(--font-color);
+}
+
+/*div {
+    background-color: var(--background);
+    color: var(--font-color);
+}*/
 
 a, .btn-link {
     color: #0071c1;

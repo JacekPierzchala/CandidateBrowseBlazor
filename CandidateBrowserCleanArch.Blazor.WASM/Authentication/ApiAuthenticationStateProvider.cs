@@ -6,10 +6,9 @@ namespace CandidateBrowserCleanArch.Blazor.WASM.Providers;
 public class ApiAuthenticationStateProvider : AuthenticationStateProvider
 {
     private readonly ITokenService _tokenService;
-
-
+    public event Action? AuthChange;
     public ApiAuthenticationStateProvider(ITokenService tokenService)
-             => _tokenService = tokenService;
+        => _tokenService = tokenService;
 
     public async override Task<AuthenticationState> GetAuthenticationStateAsync()
     {
@@ -34,6 +33,7 @@ public class ApiAuthenticationStateProvider : AuthenticationStateProvider
         var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "jwt"));
         var authState =  Task.FromResult(new AuthenticationState(user));
         NotifyAuthenticationStateChanged(authState);
+        AuthChange?.Invoke();
     }
 
     public async Task LoggedOut()

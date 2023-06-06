@@ -1,4 +1,5 @@
-﻿
+﻿@inject DialogService DialogService
+
     <RadzenMenu>
         <AuthorizeView Context="Parent" Policy=@PermissionStatics.CandidateRead>
             <Authorized  >
@@ -11,6 +12,12 @@
 
             <RadzenMenuItem class="m-1"  Icon="person">
                 <RadzenMenuItem Path="@UrlStatics.logout" class="m-1" Text="Log Out" Icon="account_circle"/>
+                <RadzenMenuItem Click="OnSettingsOpen" class="m-1" Text="My Settings" Icon="manage_accounts">
+                @*    @if(settignsOpen)
+                    {
+                        <MySettings  Close="OnSettingsClosed" />*@
+                 @*   }*@
+                </RadzenMenuItem>
             </RadzenMenuItem>
    
             </Authorized>
@@ -23,5 +30,28 @@
 
 
 @code {
+    //bool settignsOpen;
 
+    //private void OnSettingsClosed()
+    //{
+    //    settignsOpen = false;
+    //}
+    //private void OnSettingsOpen()
+    //{
+    //    settignsOpen = true;
+    //}
+
+    public async Task OnSettingsOpen()
+    {
+        await DialogService.OpenSideAsync<MySettings>("User settings", null,
+         new SideDialogOptions
+             {
+                 CloseDialogOnOverlayClick = false,
+                 Position = DialogPosition.Right,
+                 ShowMask = true,
+                 ShowTitle = true,
+                 Height = "600px;",
+                 Width = "400px;"
+             });
+    }
 }

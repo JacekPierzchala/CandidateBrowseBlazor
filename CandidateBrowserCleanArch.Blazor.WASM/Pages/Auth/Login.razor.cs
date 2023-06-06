@@ -1,17 +1,21 @@
-﻿using CandidateBrowserCleanArch.Blazor.WASM.Statics;
+﻿using CandidateBrowserCleanArch.Blazor.WASM.Pages.Users;
+using CandidateBrowserCleanArch.Blazor.WASM.Statics;
 using CandidateBrowserCleanArch.Blazor.WASM.ViewModels;
 using CandidateBrowserCleanArch.Blazor.WASM.WebServices.Authenication;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using Radzen;
 
 namespace CandidateBrowserCleanArch.Blazor.WASM.Pages.Auth;
 public partial class Login:ComponentBase
 {
-    //[Inject] IJSRuntime JSRuntime { get; set; }
+
+    [Inject] IUserSettingsProvider UserSettingsProvider { get; set; }
     [Inject] IAuthenticationService AuthenticationService { get; set; }
     [Inject] NavigationManager NavigationManager { get; set; }
     [Inject] NotificationService NotificationService { get; set; }
+  
 
     LoginViewModel LoginViewModel = new();
     string message = string.Empty;

@@ -12,7 +12,6 @@ namespace CandidateBrowserCleanArch.Blazor.WASM.Shared.Candidates;
 
 public partial class  CandidateDetailsMainInfo:ComponentBase
 {
-   // [Inject] AuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
     [Inject] ICandidatesService CandidatesService { get; set; }
     [Inject] NotificationService NotificationService { get; set; }

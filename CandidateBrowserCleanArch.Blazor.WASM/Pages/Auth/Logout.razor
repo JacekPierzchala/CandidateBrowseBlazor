@@ -1,11 +1,13 @@
 ﻿@page "/auth/logout"
 @inject IAuthenticationService AuthenticationService
+@inject IUserSettingsProvider UserSettingsProvider
 @inject NavigationManager NavigationManager
 <h3>Logout</h3>
 
 @code {
     protected async override Task OnInitializedAsync()
     {
+        await UserSettingsProvider.ClearThemes();
         await AuthenticationService.LogOut();
         NavigationManager.NavigateTo(UrlStatics.home);
     }

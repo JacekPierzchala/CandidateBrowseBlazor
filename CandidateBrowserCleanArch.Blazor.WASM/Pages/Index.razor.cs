@@ -10,8 +10,7 @@ namespace CandidateBrowserCleanArch.Blazor.WASM.Pages;
 public partial class Index:ComponentBase
 {
     [Inject] DialogService DialogService { get; set; }
-    [Inject]
-    CandidateSearchStateContainer CandidateSearchStateContainer { get; set; }
+    [Inject] CandidateSearchStateContainer CandidateSearchStateContainer { get; set; }
     [Inject] NotificationService NotificationService { get; set; }
 
     bool IsLoadDataChanged;
