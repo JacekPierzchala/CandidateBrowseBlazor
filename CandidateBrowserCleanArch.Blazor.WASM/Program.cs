@@ -27,6 +27,7 @@ builder.Services.AddScoped<AuthenticationStateProvider>(opt =>
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<RefreshTokenService>();
 builder.Services.AddScoped<HttpInterceptorService>();
+builder.Services.AddScoped<IUserSettingsProvider,UserSettingsProvider>();
 
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<DialogService>();

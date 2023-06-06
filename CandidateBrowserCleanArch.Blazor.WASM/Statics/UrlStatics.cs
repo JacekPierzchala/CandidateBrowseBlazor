@@ -9,6 +9,7 @@ internal static class UrlStatics
     internal const string register = "/auth/register";
     internal const string logout = "/auth/logout";
     internal const string users = "/users";
+    internal const string mySettings = "/mySettings";
     internal const string externalAuthentication = "/auth/externalAuthentication";
     internal const string resendConfirmation = "/auth/resendConfirmation";
     internal const string forgotPassword = "/auth/forgotpassword";

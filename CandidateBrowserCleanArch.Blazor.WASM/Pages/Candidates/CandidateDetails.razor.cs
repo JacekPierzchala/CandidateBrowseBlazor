@@ -1,9 +1,7 @@
 ﻿using CandidateBrowserCleanArch.Blazor.WASM.Services;
 using CandidateBrowserCleanArch.Blazor.WASM.WebServices;
-using CandidateBrowserCleanArch.Blazor.WASM.WebServices.Authenication;
 using CandidateBrowserCleanArch.Blazor.WASM.WebServices.Base;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 
 namespace CandidateBrowserCleanArch.Blazor.WASM.Pages.Candidates;
 

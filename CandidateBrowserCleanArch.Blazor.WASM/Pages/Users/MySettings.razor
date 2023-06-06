@@ -1,0 +1,39 @@
+﻿@inject IUserSettingsProvider UserSettingsProvider
+@attribute [Authorize(Policy = PermissionStatics.CandidateRead)]
+                <RadzenStack>
+                    <RadzenLabel>Color theme</RadzenLabel>
+    <RadzenDropDown Data="themes" @bind-Value=selectedTheme TextProperty="Theme" ValueProperty="Id" Placeholder="Select Theme" />
+                <RadzenButton Text="Save" Click="Save" />
+                </RadzenStack>
+
+
+
+
+
+@code {
+
+
+
+    private int selectedTheme;
+    private List<ConfigThemeDto> themes;
+    AuthenticationState authenticationState;
+    [CascadingParameter] 
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    private async Task Save()
+    {
+        if (selectedTheme>0)
+        {
+            await UserSettingsProvider.UpdateThemeAsync(selectedTheme,
+             authenticationState.User.Claims.FirstOrDefault(c => c.Type == CustomClaimTypes.Uid).Value);
+        }
+
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        authenticationState = await authenticationStateTask;
+        themes = (await UserSettingsProvider.GetAllThemesAsync()).ToList();
+        selectedTheme = themes.FirstOrDefault(c => c.Theme == UserSettingsProvider.SelectedTheme)?.Id ?? 0;
+    }
+}

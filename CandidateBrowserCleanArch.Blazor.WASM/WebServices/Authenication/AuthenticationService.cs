@@ -13,7 +13,7 @@ namespace CandidateBrowserCleanArch.Blazor.WASM.WebServices.Authenication
     {
         private readonly AuthenticationStateProvider _authenticationStateProvider;
         private readonly IMapper _mapper;
-        private readonly IWebAssemblyHostEnvironment _hostEnvironment;
+        private readonly IWebAssemblyHostEnvironment _hostEnvironment;     
         private readonly string _redirect_uri;
 
         public AuthenticationService(
@@ -25,6 +25,7 @@ namespace CandidateBrowserCleanArch.Blazor.WASM.WebServices.Authenication
            _authenticationStateProvider = authenticationStateProvider;
             _mapper = mapper;
             _hostEnvironment = hostEnvironment;
+
             _redirect_uri = $"{_hostEnvironment.BaseAddress}" + UrlStatics.signinGoogle;
         }
 
@@ -96,6 +97,7 @@ namespace CandidateBrowserCleanArch.Blazor.WASM.WebServices.Authenication
 
         public async Task LogOut()
         {
+            //_userSettingsProvider.
             await ((ApiAuthenticationStateProvider)_authenticationStateProvider).LoggedOut();
         }
 
