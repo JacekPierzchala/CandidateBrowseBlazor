@@ -25,6 +25,7 @@ public partial class Login:ComponentBase
 
     private async Task HandleLogin()
     {
+        message = "Authorizing...";
         LoggingProcessPending = true;
         LoggingProcessError = false;
         StateHasChanged();
@@ -41,7 +42,7 @@ public partial class Login:ComponentBase
             LoggingProcessError = true;
         }
         LoggingProcessPending = false;
-
+        message = string.Empty;
         StateHasChanged();
     }
 
@@ -52,6 +53,8 @@ public partial class Login:ComponentBase
 
     private async Task HandleGoogleLogin()
     {
+        message = "Routing to Google authentication...";
+        LoggingProcessPending = true;
         var response = await AuthenticationService.GetGoogleAuthUrlAsync();
         if (!response.Success)
         {

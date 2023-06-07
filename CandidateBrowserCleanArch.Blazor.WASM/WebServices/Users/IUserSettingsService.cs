@@ -15,7 +15,7 @@ public class UserSettingsService : BaseHttpService, IUserSettingsService
 {
     private readonly IMapper _mapper;
     private readonly IAuthenticationService _authenticationService;
-
+    private IEnumerable<ConfigThemeDto> _themes;
     public UserSettingsService
         (ICandidateBrowserWebAPIClient client, 
         ITokenService tokenService, 
@@ -35,9 +35,16 @@ public class UserSettingsService : BaseHttpService, IUserSettingsService
         {
             if (await GetBearerTokenAsync())
             {
-                var resultApi = await _client.ThemesAsync(ApiVersion);
-                response.Success = resultApi.Success;
-                response.Data = resultApi.Data;
+                if (_themes == null)
+                {
+                    var resultApi = await _client.ThemesAsync(ApiVersion);
+                    _themes = resultApi.Data;
+                };
+
+           
+                response.Data = _themes;
+                response.Success = true;
+
             }
             else
             {
