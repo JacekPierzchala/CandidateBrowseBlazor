@@ -17,7 +17,7 @@ public partial class CandidatesList:ComponentBase, IDisposable
     public EventCallback<Tuple<bool, bool>> LoadDataChanged { get; set; }
     bool LoadDataSuccess { get; set; }
     private string ErrorMessage = string.Empty;
-    IEnumerable<CandidateListDto>? Candidates;
+    public IEnumerable<CandidateListDto>? Candidates;
 
     protected async override Task OnInitializedAsync()
     {
@@ -27,7 +27,7 @@ public partial class CandidatesList:ComponentBase, IDisposable
         await SearchAsync();
 
     }
-    private async Task SearchAsync()
+    public async Task SearchAsync()
     {
         Candidates = null;
         StateHasChanged();

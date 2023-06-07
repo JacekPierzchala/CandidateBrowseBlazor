@@ -2,7 +2,7 @@
 
 namespace CandidateBrowserCleanArch.Blazor.WASM.WebServices.Base;
 
-public abstract class BaseHttpService
+public abstract  class BaseHttpService
 {
     protected readonly ICandidateBrowserWebAPIClient _client;
     protected readonly ITokenService _tokenService;
