@@ -24,6 +24,7 @@ public partial class Register:ComponentBase
         RegisterProcessPending = true;
         RegisterProcessError = false;
         RegisterProcessSuccess = false;
+        message = "Registering ...";
         StateHasChanged();
 
         var response = await AuthenticationService.RegisterAsync(RegisterViewModel);
@@ -57,6 +58,8 @@ public partial class Register:ComponentBase
 
     private async Task HandleGoogleLogin()
     {
+        message = "Routing to Google authentication...";
+        RegisterProcessPending = true;
         var response = await AuthenticationService.GetGoogleAuthUrlAsync();
         if (!response.Success)
         {
